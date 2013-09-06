@@ -1,0 +1,62 @@
+body {
+	background: url(grass2.jpg);
+	font-family: verdana, Helvetica, Arial, sans-serif;
+	font-size: 10pt;
+}
+
+th {
+	vertical-align: bottom;
+	font-size: 10pt;
+	width:30px;
+}
+
+td {
+	text-align: center;
+}
+
+.main {
+	width: 800px;
+	background: white;
+	box-shadow: rgba(0, 0, 0, 0.5) 5px 5px 5px 5px;
+}
+.banner {
+	width: 800px;
+	display:inline-block;
+	box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 9px 0px;
+}
+
+.heading {
+	padding: 20px 0px 5px 20px;
+	background-image:url('drop.png');
+	background-repeat:no-repeat;
+	background-position:left center; 
+	font-size: 2em;
+	font-weight: bold;
+	float: left;
+}
+
+.timestamp {
+	float: right; 
+	text-align: right;
+	padding: 20px 10px 5px 20px;
+}
+
+.schedule {
+	margin: 10px 10px 10px 10px;
+}
+
+#timePopup, #datePopup, #startPopup {
+	display:none; 
+	position:absolute;
+	z-index:100; 
+	border: 1px solid black;
+	border-radius: 5px;
+	padding:5 5 5 5px; 
+	background:#dddddd;
+	width:250px;
+	text-align: center;
+}
+
+#status, #date, #time {
+	font-weight: bold;
+}

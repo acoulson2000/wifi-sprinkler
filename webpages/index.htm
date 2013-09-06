@@ -1,0 +1,450 @@
+<!--
+/************************************************************************/
+/*																		*/
+/*	index.htm -- Main page for WiH2O opensource wifi-enable lawn		*/
+/*		sprinkler controller application for chipKIT PIC32 				*/
+/*		microcontroller boards											*/
+/*																		*/
+/************************************************************************/
+/*	Author: 	Andy Coulson											*/
+/*	Copyright 2013, Practical Apps, LLC									*/
+/************************************************************************/
+-->
+<html>
+	<head>
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="main.css">
+		<link rel="stylesheet" type="text/css" href="jqui.css">
+		<link rel="stylesheet" type="text/css" href="jquithem.css">
+		<link rel="stylesheet" type="text/css" href="jquidp.css">
+		<!--script src="jqrymin.js"></script-->
+		<script src="jqrymin.js"></script>
+		<script src="jquimin.js"></script>
+		<script src="jsrender.js"></script>
+	</head>
+	<body>
+	
+		<div class="main">
+			<div class="banner">
+				<div class="heading">WiWater <img src="spinner1.gif" id="loading" style="display:none"/></div>
+				<div class="timestamp">
+					<div id="date">07/10/13</div>
+					<div id="time">hh:mm</div>
+					<div id="timePopup">
+						<div style="height:20px">
+							<div id="validateTips" class="ui-state-highlight" style="display:none;">&nbsp;</div>
+						</div>
+						<label>New Time:</label><input id="txtTime" type="text" size="5" maxlength="5" value="xx:xx"/><br/><br/>
+						<button id="timeSubmit">Submit</button>
+						<button id="timeCancel">Cancel</button>
+					</div>
+					<div id="datePopup">
+						<div style="height:20px">
+							<div id="validateTips" class="ui-state-highlight" style="display:none;">&nbsp;</div>
+						</div>
+						<label>New Date:</label><input id="txtDate" type="text" size="8" maxlength="8" value="xx:xx:xx"/><br/><br/>
+						<button id="dateSubmit">Submit</button>
+						<button id="dateCancel">Cancel</button>
+					</div>
+				</div>
+			</div>
+			<div class="schedule">
+				<div style="">Status: <span id="status">pending...<span></div>
+				<div>
+					&nbsp;&nbsp;
+					<img src="start24.png" alt="Run Program" id="pgmStart"/>
+					&nbsp;&nbsp;&nbsp;
+					<img src="pause24.png" alt="Stop Program" id="pgmStop"/>
+				</div>
+				<div style="height:20px">
+					<div id="validateTips" class="ui-state-highlight" style="display:none; width:auto;">&nbsp;</div>
+				</div>
+				
+				<div id="startValidateTips" class="ui-state-highlight" style="display:none;">&nbsp;</div>
+				<table border="0" cellpadding="1" cellspacing="1">
+					<thead>
+						<tr>
+							<th align="left">Event Description</th>
+							<th>Zone Num</th>
+							<th>Start Time</th>
+							<th>Run Time</th>
+							<th>Sun</th>
+							<th>Mon</th>
+							<th>Tues</th>
+							<th>Wed</th>
+							<th>Thur</th>
+							<th>Fri</th>
+							<th>Sat</th>
+							<th></th>
+							<th colspan="2">Immediate</th>
+						</tr>
+					</thead>
+					<tbody id="eventTable">
+						<form action="save.do" id="event_0" method="post">
+						<tr>
+							<td scope="col">
+								<input name="eventIdx" type="hidden" value="0" />
+								<input maxlength="32" name="zoneName" size="32" type="text" value="-unspecified-" />
+							</td>
+							<td scope="col">
+								<select name="zoneNumber" size="1"><option selected="selected" value="">off</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></td>
+							<td scope="col">
+								<input maxlength="5" name="zoneStart" size="5" type="text" value="12:00" /></td>
+							<td scope="col">
+								<input maxlength="2" name="zoneRuntime" size="2" type="text" value="0" /></td>
+							<td scope="col">
+								<input name="zoneSunday" type="checkbox" value="1" /></td>
+							<td scope="col">
+								<input name="zoneMonday" type="checkbox" value="1" /></td>
+							<td scope="col">
+								<input name="zoneTuesday" type="checkbox" value="1" /></td>
+							<td scope="col">
+								<input name="zoneWednesday" type="checkbox" value="1" /></td>
+							<td scope="col">
+								<input name="zoneThursday" type="checkbox" value="1" /></td>
+							<td scope="col">
+								<input name="zoneFriday" type="checkbox" value="1" /></td>
+							<td scope="col">
+								<input name="zoneSaturday" type="checkbox" value="1" /></td>
+							<td scope="col">
+								<input alt="Save" id="zoneSave_1" type="submit" value="Save"/></td>
+							<td scope="col">
+								<input alt="Zone 1 On" id="zoneStart" src="on24.png" style="width: 24px; height: 24px;" type="image" /></td>
+							<td scope="col">
+								<input alt="Zone 1 Off" id="zoneStop" src="off24.png" style="width: 24px; height: 24px;" type="image" /></td>
+						</form>
+						</tr>
+						<form action="save.do" id="event_1" method="post">
+						<tr>
+							<td scope="col">
+								<input name="eventIdx" type="hidden" value="1" />
+								<input maxlength="32" name="zoneName" size="32" type="text" value="-unspecified-" />
+							</td>
+							<td scope="col">
+								<select name="zoneNumber" size="1"><option selected="selected" value="">off</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></td>
+							<td scope="col">
+								<input maxlength="5" name="zoneStart" size="5" type="text" value="12:00" /></td>
+							<td scope="col">
+								<input maxlength="2" name="zoneRuntime" size="2" type="text" value="0" /></td>
+							<td scope="col">
+								<input name="zoneSunday" type="checkbox" value="1" /></td>
+							<td scope="col">
+								<input name="zoneMonday" type="checkbox" value="1" /></td>
+							<td scope="col">
+								<input name="zoneTuesday" type="checkbox" value="1" /></td>
+							<td scope="col">
+								<input name="zoneWednesday" type="checkbox" value="1" /></td>
+							<td scope="col">
+								<input name="zoneThursday" type="checkbox" value="1" /></td>
+							<td scope="col">
+								<input name="zoneFriday" type="checkbox" value="1" /></td>
+							<td scope="col">
+								<input name="zoneSaturday" type="checkbox" value="1" /></td>
+							<td scope="col">
+								<input alt="Save" id="zoneSave_1" type="submit" value="Save"/></td>
+							<td scope="col">
+								<input alt="Zone 1 On" id="zoneStart" src="on24.png" style="width: 24px; height: 24px;" type="image" /></td>
+							<td scope="col">
+								<input alt="Zone 1 Off" id="zoneStop" src="off24.png" style="width: 24px; height: 24px;" type="image" /></td>
+						</form>
+						</tr>
+					</tbody>
+				</table>
+				<br/>
+			</div>
+		</div>
+		
+	</body>
+	
+	<script id="eventTmpl" type="text/x-jsrender">
+		<tr>
+		<form action="save.do" id="event_0" method="post">
+			<td scope="col">
+				<input name="eventIdx" type="hidden" value="{{>eventIdx}}" />
+				<input maxlength="32" name="eventName" size="36" type="text" value="{{>eventName}}" />
+			</td>
+			<td scope="col">
+				<select name="zoneNumber" size="1">
+					<option value="" {{selector:eventActive match='off'}}>off</option>
+					<option value="1" {{selector:zoneNumber match='1'}}>1</option>
+					<option value="2" {{selector:zoneNumber match='2'}}>2</option>
+					<option value="3" {{selector:zoneNumber match='3'}}>3</option>
+					<option value="3" {{selector:zoneNumber match='4'}}>4</option>
+					<option value="3" {{selector:zoneNumber match='5'}}>5</option>
+					<option value="3" {{selector:zoneNumber match='6'}}>6</option>
+				</select>
+			</td>
+			<td scope="col">
+				<input maxlength="5" name="eventStart" size="5" type="text" value="{{>eventTime}}" id="zoneTime_{{>eventIdx}}"/>
+			</td>
+			<td scope="col">
+				<input maxlength="2" name="eventRuntime" size="2" type="text" value="{{>eventRuntime}}" /></td>
+			<td scope="col">
+				<input name="eventSunday" type="checkbox" {{checker:eventRunOn day='Sunday'}} value="1" /></td>
+			<td scope="col">
+				<input name="eventMonday" type="checkbox" {{checker:eventRunOn day='Monday'}} value="1" /></td>
+			<td scope="col">
+				<input name="eventTuesday" type="checkbox" {{checker:eventRunOn day='Tuesday'}} value="1" /></td>
+			<td scope="col">
+				<input name="eventWednesday" type="checkbox" {{checker:eventRunOn day='Wednesday'}} value="1" /></td>
+			<td scope="col">
+				<input name="eventThursday" type="checkbox" {{checker:eventRunOn day='Thursday'}} value="1" /></td>
+			<td scope="col">
+				<input name="eventFriday" type="checkbox" {{checker:eventRunOn day='Friday'}} value="1" /></td>
+			<td scope="col">
+				<input name="eventSaturday" type="checkbox" {{checker:eventRunOn day='Saturday'}} value="1" /></td>
+			<td scope="col">
+				<input alt="Save" type="submit" value="Save"/></td>
+			<td scope="col">
+				<input alt="Zone 1 On" id="eventStart" src="on24.png" style="width: 24px; height: 24px;" type="image" /></td>
+			<td scope="col">
+				<input alt="Zone 1 Off" id="eventStop" src="off24.png" style="width: 24px; height: 24px;" type="image" /></td>
+		</form>
+		</tr>
+	</script>
+
+	<script>
+	$(document).ajaxStart(function() {
+		$("#loading").show();
+	});
+	$(document).ajaxComplete(function() {
+		$("#loading").hide();
+	});
+	
+	function updateTips(tipHolder, t ) {
+		tips = tipHolder.find( "#validateTips" );
+		tips.text( t ).fadeIn("fast");
+		setTimeout(function() {
+			tips.fadeOut("slow");
+		}, 2000 );
+	}
+	
+	function checkRegexp( o, regexp, n, tipHolder ) {
+		if ( !( regexp.test( o.val() ) ) ) {
+			o.addClass( "ui-state-error" );
+			updateTips(tipHolder, n );
+			return false;
+		} else {
+			return true;
+		}
+    }
+
+	//var jsondata = [{eventIdx: 0, eventName: 'NAME_1_xxxxxxxxxxxxxxxxxxxxx321|', zoneNumber: 1, eventActive: 'Y', eventTime: '19:30', eventRuntime: 10, eventRunOn: 'YNYNYNN'}];
+
+	$(function () {	
+		$.views.converters({
+			checker: function (value) {
+				var result = "";
+				var testDay = this.tagCtx.props.day;
+				if (
+					(testDay == "Sunday" && value.substr(0,1) == "Y")
+					|| (testDay == "Monday" && value.substr(1,1) == "Y")
+					|| (testDay == "Tuesday" && value.substr(2,1) == "Y")
+					|| (testDay == "Wednesday" && value.substr(3,1) == "Y")
+					|| (testDay == "Thursday" && value.substr(4,1) == "Y")
+					|| (testDay == "Friday" && value.substr(5,1) == "Y")
+					|| (testDay == "Saturday" && value.substr(6,1) == "Y")
+				) {
+					result = "CHECKED = 'CHECKED'";
+				}
+				return result;
+			},
+			selector: function (value) {
+				var result = "";
+				var test = this.tagCtx.props.match;
+				if (
+					(test == "off" && value == "N")
+					|| (test == "1" && value == "1")
+					|| (test == "2" && value == "2")
+					|| (test == "3" && value == "3")
+					|| (test == "4" && value == "4")
+					|| (test == "5" && value == "5")
+					|| (test == "6" && value == "6")
+				) {
+					result = "SELECTED = 'SELECTED'";
+				}
+				return result;
+			}
+		});
+		
+//			$("#eventTable").html(
+//				$("#eventTmpl").render(jsondata)
+//			);
+
+
+		$.getJSON('getevnts.do', {format: "json"}).done(function( jsondata ) {		
+			$("#eventTable").html(
+				$("#eventTmpl").render(jsondata)
+			);
+						
+			$("form").submit(function(event) {
+				var params = $(this).serialize();
+				$.ajax({
+					url: "saveevnt.do",
+					type: "get",
+					data: params,
+					timeout: 5000,
+					dataType: "text",
+					success: function(data){},
+					error:function(){
+						alert("Failed to contact WiWater controller");
+					}   
+				}); 
+				return false;
+			});
+		});
+
+		$("[id^='zoneTime_']").change( function(event) {
+			$('#txtTime').val($('#time').text());
+			var clickedId = '#' + this.id;
+			if (checkRegexp( $(this), /^[0-2][0-9]:[0-5][0-9]$/, "Time must be in format hh:mm", $(".schedule") )) {
+				$(this).removeClass( "ui-state-error" );
+			}
+		});
+
+		$('#time').click( function() {
+			$('#txtTime').val($('#time').text());
+            loadPopupBox('#timePopup', '#time');
+		});
+		
+		$('#timeSubmit').click( function() {
+			sTime = $('#txtTime');
+			if (checkRegexp( sTime, /^[0-2][0-9]:[0-5][0-9]$/, "Time must be in format hh:mm", sTime.parent() )) {
+				$("#time").text(sTime.val());
+				unloadPopupBox('#timePopup');
+				sTime.removeClass( "ui-state-error" );
+				tDate = $("#date").text();
+				tTime = $("#time").text();
+				$.ajax({
+					url: "settime.do?date=" + tDate + "&time=" + tTime + ":00",
+					type: "get",
+					timeout: 5000,
+					dataType: "text",
+					success: function(data){},
+					error:function(){
+						alert("Failed to contact WiWater controller");
+					}   
+				}); 
+			} else
+				return false;
+        });
+		
+		$('#timeCancel').click( function() {
+			$('#txtTime').removeClass( "ui-state-error" );
+            unloadPopupBox('#timePopup');
+        });
+		
+		$( "#txtDate" ).datepicker({ dateFormat: "mm/dd/y" });
+	
+		$('#date').click( function() {
+			$('#txtDate').val($('#date').text());
+            loadPopupBox('#datePopup', '#date');
+		});
+		
+		$('#dateSubmit').click( function() {
+			sDate = $('#txtDate');
+			if (checkRegexp( sDate, /^[0-1][0-9]\/[0-3][0-9]\/[0-9][0-9]$/, "Date must be in format mm/dd/yy", sDate.parent() )) {
+				$("#date").text(sDate.val());
+				unloadPopupBox('#datePopup');
+				sTime.removeClass( "ui-state-error" );
+				tDate = $("#date").text();
+				tTime = $("#time").text();
+				$.ajax({
+					url: "settime.do?date=" + tDate + "&time=" + tTime + ":00",
+					type: "get",
+					timeout: 5000,
+					dataType: "text",
+					success: function(data){},
+					error:function(){
+						alert("Failed to contact WiWater controller");
+					}   
+				}); 
+			} else
+				return false;
+        });
+		
+		$('#dateCancel').click( function() {
+			$('#txtDate').removeClass( "ui-state-error" );
+            unloadPopupBox('#datePopup');
+        });
+
+		function loadPopupBox(which, relativeTo) {    // To Load the Popupbox
+            $(which).fadeIn("fast");
+			$(which).position({
+				my: 'center top',
+				at: 'center top',
+				of: relativeTo
+			});
+        }
+
+		function unloadPopupBox(which) {    // TO Unload the Popupbox
+            $(which).fadeOut("fast");
+        }
+		
+		
+		getStatus();
+		
+		setInterval(function(){getStatus()},10000);
+	});
+	
+	$("#pgmStart").click(function(event) {
+		if (!this.disabled) {
+			$.ajax({
+				url: "setsts.do",
+				type: "get",
+				data: { state: "Running" },
+				timeout: 5000,
+				success: function(){
+					getStatus();
+				},
+				error:function(){
+					alert("Failed to contact WiWater controller");
+				}   
+			}); 
+		}
+	});
+	
+	$("#pgmStop").click(function(event) {
+		if (!this.disabled) {
+			$.ajax({
+				url: "setsts.do",
+				type: "get",
+				data: { state: "Paused" },
+				timeout: 2000,
+				success: function(){
+					getStatus();
+				},
+				error:function(){
+					alert("Failed to contact WiWater controller");
+				}   
+			}); 
+		}
+	});
+	
+	function getStatus() {
+		$.getJSON("/getsts.do")
+			.done(function( json ) {
+				$("#status").html(json.status);
+				$("#time").html(json.time.substring(0,5));
+				if (json.status == "Running") {
+					$("#pgmStart").css({ opacity: 0.4 }).prop('disabled', true);
+					$("#pgmStop").css({ opacity: 1 }).prop('disabled', false);
+				} else if (json.status == "Paused") {
+					$("#pgmStart").css({ opacity: 1 }).prop('disabled', false);
+					$("#pgmStop").css({ opacity: 0.4 }).prop('disabled', true);
+				} else {
+					$("#pgmStart").css({ opacity: 0.4 });
+					$("#pgmStop").css({ opacity: 0.4 });
+				}
+			})
+			.fail(function( jqxhr, textStatus, error ) {
+				var err = textStatus + ', ' + error;
+				console.log( "Request Failed: " + err);
+				$("#status").html("Not Responding");
+				$("#pgmStart").css({ opacity: 0.4 });
+				$("#pgmStop").css({ opacity: 0.4 });
+			});
+	}
+	
+	</script>
+</html>
