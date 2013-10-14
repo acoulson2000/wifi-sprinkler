@@ -54,8 +54,8 @@
 
 /* Symbols to set the limits on resources used by the parser.
 */
-#define		cchResourcePathMax	128
-#define		cchParamNameMax		32
+#define		cchResourcePathMax	256
+#define		cchParamNameMax		64
 #define		cchParamValueMax	64
 
 /* ------------------------------------------------------------ */
@@ -80,7 +80,7 @@ extern ZONE_INFO zones[MAX_EVENTS] ;
 /* ------------------------------------------------------------ */
 
 char *	pchInputCur;
-char	szParamLine[cchParamNameMax+cchParamValueMax+2];
+//char	szParamLine[cchParamNameMax+cchParamValueMax+2]; 		
 char	szResourcePath[cchResourcePathMax+1];
 char	szParamName[cchParamNameMax+1];
 char	szParamValue[cchParamValueMax+1];
@@ -100,7 +100,8 @@ void ParseFileResource();
 void ParseFileType(char szRes[], char szTyp[]);
 void ParseSetPgmStatus();
 void ParseSetTime();
-void ParseSaveEvtStatus();
+void ParseSaveEvt();
+void ParseSetZone();
 void ParseFormParameter(char * szName, char * szValue);
 void ParseToken(char * szOutput, char chDelim);
 char PeekChar();
@@ -262,7 +263,14 @@ void ParseGetRequest() {
 	else if (stricmp(szResourcePath, szResSaveEvent) == 0) {
 		/* Request for save of event info		*/		
 		NextChar();
-		ParseSaveEvtStatus();
+		ParseSaveEvt();
+		idresRequest = idresSaveEvent;
+		rtypResource = rtypText;
+	}
+	else if (stricmp(szResourcePath, szResSetZoneState) == 0) {
+		/* Request for save of event info		*/		
+		NextChar();
+		ParseSetZone();
 		idresRequest = idresSaveEvent;
 		rtypResource = rtypText;
 	}
@@ -624,7 +632,51 @@ void ParseSetTime() {
 }
 
 /* ------------------------------------------------------------ */
-/***	ParseSaveEvtStatus
+/***	ParseSetZone
+**
+**	Parameters:
+**		state
+**
+**	Return Value:
+**		none
+**
+**	Errors:
+**		none
+**
+**	Description:
+**		The URL for the form GET request looks like this:
+**
+**		/setzone.do?zoneNum=0&zoneState=1 (where zoneState= 0 or 1 for off or on)
+*/
+void ParseSetZone() {
+	int			eventIdx = 0;
+	
+	while (PeekChar() != ' ') {
+		/* Get the next NAME, VALUE pair from the line */
+		ParseFormParameter(szParamName, szParamValue);
+
+		if (stricmp(szParamName, "zoneNum") == 0) {
+			eventIdx = atoi(szParamValue);
+		} else if (stricmp(szParamName, "zoneState") == 0) {
+//Serial.print("setzone: "); Serial.print(eventIdx); Serial.println(atoi(szParamValue), DEC);
+			if (atoi(szParamValue) == 0) {
+				turnOff(eventIdx-1);
+			} else if (atoi(szParamValue) == 1)  {
+				turnOn(eventIdx-1);
+			}
+		} else {
+			/* Have an invalid parameter name. */
+			errParse = errBadRequest;
+		}
+				
+		/* Eat any '&' so we are ready to parse the next parameter.		*/
+		if (PeekChar() == '&') { NextChar(); }
+	}
+	errParse = errOK;
+}
+	
+/* ------------------------------------------------------------ */
+/***	ParseSaveEvt
 **
 **	Parameters:
 **		state
@@ -640,7 +692,7 @@ void ParseSetTime() {
 **
 **		/saveevnt.do?eventNumber=0&eventName=-unspecified-&zoneNumber=1&eventStart=12%3A00%3A00&eventRuntime=10&eventSunday=1&eventWednesday=1
 */
-void ParseSaveEvtStatus() {
+void ParseSaveEvt() {
 	int			eventIdx = 0;
 	char  		eventName[64];
 	char  		decodedName[64];
@@ -671,39 +723,46 @@ void ParseSaveEvtStatus() {
 		else if (stricmp(szParamName, "eventName") == 0) {
 			strncpy(eventName, szParamValue, strlen(szParamValue));
 			eventName[strlen(szParamValue)] = 0;
+//Serial.print("eventName: "); Serial.println(eventName);
 		}
 		else if (stricmp(szParamName, "zoneNumber") == 0) {
 			zoneNum = atoi(szParamValue);
+//Serial.print("zoneNum: "); Serial.println(zoneNum, DEC);
 		}
 		else if (stricmp(szParamName, "eventStart") == 0) {
 			strncpy(szTemp, szParamValue, 2);szTemp[2] =0;
 			eventStartHour = atoi(szTemp);
 			strncpy(szTemp, szParamValue+5, 2);szTemp[2] =0;
 			eventStartMinute = atoi(szTemp);
+//Serial.print("eventStartHour: "); Serial.println(eventStartHour, DEC);
+//Serial.print("eventStartMinute: "); Serial.println(eventStartMinute, DEC);
 		}
 		else if (stricmp(szParamName, "eventRuntime") == 0) {
 			eventRuntime = atoi(szParamValue);
+//Serial.print("eventRuntime: "); Serial.println(eventRuntime, DEC);
 		}
-		else if (stricmp(szParamName, "eventSunday") == 0) {
+		else if (stricmp(szParamName, "eventSun") == 0) {
 			eventSunday = 'Y';
 		}
-		else if (stricmp(szParamName, "eventMonday") == 0) {
+		else if (stricmp(szParamName, "eventMon") == 0) {
 			eventMonday = 'Y';
 		}
-		else if (stricmp(szParamName, "eventTuesday") == 0) {
+		else if (stricmp(szParamName, "eventTues") == 0) {
 			eventTuesday = 'Y';
 		}
-		else if (stricmp(szParamName, "eventWednesday") == 0) {
+		else if (stricmp(szParamName, "eventWed") == 0) {
 			eventWednesday = 'Y';
 		}
-		else if (stricmp(szParamName, "eventThursday") == 0) {
+		else if (stricmp(szParamName, "eventThurs") == 0) {
 			eventThursday = 'Y';
 		}
-		else if (stricmp(szParamName, "eventFriday") == 0) {
+		else if (stricmp(szParamName, "eventFri") == 0) {
 			eventFriday = 'Y';
 		}
-		else if (stricmp(szParamName, "eventSaturday") == 0) {
+		else if (stricmp(szParamName, "eventSat") == 0) {
 			eventSaturday = 'Y';
+//Serial.print("eventdays: "); Serial.println(eventSunday); Serial.println(eventMonday); Serial.println(eventTuesday); 
+//Serial.println(eventWednesday); Serial.println(eventThursday); Serial.println(eventFriday); Serial.println(eventSaturday); Serial.println("");
 		}
 		else {
 			/* Have an invalid parameter name.

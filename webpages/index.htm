@@ -1,7 +1,7 @@
 <!--
 /************************************************************************/
 /*																		*/
-/*	index.htm -- Main page for WiH2O opensource wifi-enable lawn		*/
+/*	index.htm - Main page for WiH2O opensource wifi-enable lawn		*/
 /*		sprinkler controller application for chipKIT PIC32 				*/
 /*		microcontroller boards											*/
 /*																		*/
@@ -26,7 +26,7 @@
 	
 		<div class="main">
 			<div class="banner">
-				<div class="heading">WiWater <img src="spinner1.gif" id="loading" style="display:none"/></div>
+				<div class="heading">WiH2O <img src="spinner1.gif" id="loading" style="display:none"/></div>
 				<div class="timestamp">
 					<div id="date">07/10/13</div>
 					<div id="time">hh:mm</div>
@@ -49,7 +49,7 @@
 				</div>
 			</div>
 			<div class="schedule">
-				<div style="">Status: <span id="status">pending...<span></div>
+				<div style="">Status: <span id="status">pending...<span/></div>
 				<div>
 					&nbsp;&nbsp;
 					<img src="start24.png" alt="Run Program" id="pgmStart"/>
@@ -77,75 +77,43 @@
 							<th>Sat</th>
 							<th></th>
 							<th colspan="2">Immediate</th>
+							<th>Last Ran</th>
 						</tr>
 					</thead>
 					<tbody id="eventTable">
 						<form action="save.do" id="event_0" method="post">
 						<tr>
-							<td scope="col">
+							<td>
 								<input name="eventIdx" type="hidden" value="0" />
 								<input maxlength="32" name="zoneName" size="32" type="text" value="-unspecified-" />
 							</td>
-							<td scope="col">
+							<td>
 								<select name="zoneNumber" size="1"><option selected="selected" value="">off</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></td>
-							<td scope="col">
+							<td>
 								<input maxlength="5" name="zoneStart" size="5" type="text" value="12:00" /></td>
-							<td scope="col">
+							<td>
 								<input maxlength="2" name="zoneRuntime" size="2" type="text" value="0" /></td>
-							<td scope="col">
+							<td>
 								<input name="zoneSunday" type="checkbox" value="1" /></td>
-							<td scope="col">
+							<td>
 								<input name="zoneMonday" type="checkbox" value="1" /></td>
-							<td scope="col">
+							<td>
 								<input name="zoneTuesday" type="checkbox" value="1" /></td>
-							<td scope="col">
+							<td>
 								<input name="zoneWednesday" type="checkbox" value="1" /></td>
-							<td scope="col">
+							<td>
 								<input name="zoneThursday" type="checkbox" value="1" /></td>
-							<td scope="col">
+							<td>
 								<input name="zoneFriday" type="checkbox" value="1" /></td>
-							<td scope="col">
+							<td>
 								<input name="zoneSaturday" type="checkbox" value="1" /></td>
-							<td scope="col">
+							<td>
 								<input alt="Save" id="zoneSave_1" type="submit" value="Save"/></td>
-							<td scope="col">
-								<input alt="Zone 1 On" id="zoneStart" src="on24.png" style="width: 24px; height: 24px;" type="image" /></td>
-							<td scope="col">
-								<input alt="Zone 1 Off" id="zoneStop" src="off24.png" style="width: 24px; height: 24px;" type="image" /></td>
-						</form>
-						</tr>
-						<form action="save.do" id="event_1" method="post">
-						<tr>
-							<td scope="col">
-								<input name="eventIdx" type="hidden" value="1" />
-								<input maxlength="32" name="zoneName" size="32" type="text" value="-unspecified-" />
-							</td>
-							<td scope="col">
-								<select name="zoneNumber" size="1"><option selected="selected" value="">off</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></td>
-							<td scope="col">
-								<input maxlength="5" name="zoneStart" size="5" type="text" value="12:00" /></td>
-							<td scope="col">
-								<input maxlength="2" name="zoneRuntime" size="2" type="text" value="0" /></td>
-							<td scope="col">
-								<input name="zoneSunday" type="checkbox" value="1" /></td>
-							<td scope="col">
-								<input name="zoneMonday" type="checkbox" value="1" /></td>
-							<td scope="col">
-								<input name="zoneTuesday" type="checkbox" value="1" /></td>
-							<td scope="col">
-								<input name="zoneWednesday" type="checkbox" value="1" /></td>
-							<td scope="col">
-								<input name="zoneThursday" type="checkbox" value="1" /></td>
-							<td scope="col">
-								<input name="zoneFriday" type="checkbox" value="1" /></td>
-							<td scope="col">
-								<input name="zoneSaturday" type="checkbox" value="1" /></td>
-							<td scope="col">
-								<input alt="Save" id="zoneSave_1" type="submit" value="Save"/></td>
-							<td scope="col">
-								<input alt="Zone 1 On" id="zoneStart" src="on24.png" style="width: 24px; height: 24px;" type="image" /></td>
-							<td scope="col">
-								<input alt="Zone 1 Off" id="zoneStop" src="off24.png" style="width: 24px; height: 24px;" type="image" /></td>
+							<td>
+								<img alt="Zone 1 On" name="zoneOn" src="on24.png" style="width: 24px; height: 24px;"/></td>
+							<td>
+								<img alt="Zone 1 Off" name="zoneOff" src="off24.png" style="width: 24px; height: 24px;"/></td>
+							<td></td>
 						</form>
 						</tr>
 					</tbody>
@@ -157,81 +125,63 @@
 	</body>
 	
 	<script id="eventTmpl" type="text/x-jsrender">
+		{{for events}}
 		<tr>
 		<form action="save.do" id="event_0" method="post">
-			<td scope="col">
+			<td>
 				<input name="eventIdx" type="hidden" value="{{>eventIdx}}" />
 				<input maxlength="32" name="eventName" size="36" type="text" value="{{>eventName}}" />
 			</td>
-			<td scope="col">
-				<select name="zoneNumber" size="1">
-					<option value="" {{selector:eventActive match='off'}}>off</option>
-					<option value="1" {{selector:zoneNumber match='1'}}>1</option>
-					<option value="2" {{selector:zoneNumber match='2'}}>2</option>
-					<option value="3" {{selector:zoneNumber match='3'}}>3</option>
-					<option value="3" {{selector:zoneNumber match='4'}}>4</option>
-					<option value="3" {{selector:zoneNumber match='5'}}>5</option>
-					<option value="3" {{selector:zoneNumber match='6'}}>6</option>
+			<td>
+				<select name="zoneNumber" size="1" id="zoneNumber_{{>eventIdx}}">
 				</select>
 			</td>
-			<td scope="col">
+			<td>
 				<input maxlength="5" name="eventStart" size="5" type="text" value="{{>eventTime}}" id="zoneTime_{{>eventIdx}}"/>
 			</td>
-			<td scope="col">
+			<td>
 				<input maxlength="2" name="eventRuntime" size="2" type="text" value="{{>eventRuntime}}" /></td>
-			<td scope="col">
-				<input name="eventSunday" type="checkbox" {{checker:eventRunOn day='Sunday'}} value="1" /></td>
-			<td scope="col">
-				<input name="eventMonday" type="checkbox" {{checker:eventRunOn day='Monday'}} value="1" /></td>
-			<td scope="col">
-				<input name="eventTuesday" type="checkbox" {{checker:eventRunOn day='Tuesday'}} value="1" /></td>
-			<td scope="col">
-				<input name="eventWednesday" type="checkbox" {{checker:eventRunOn day='Wednesday'}} value="1" /></td>
-			<td scope="col">
-				<input name="eventThursday" type="checkbox" {{checker:eventRunOn day='Thursday'}} value="1" /></td>
-			<td scope="col">
-				<input name="eventFriday" type="checkbox" {{checker:eventRunOn day='Friday'}} value="1" /></td>
-			<td scope="col">
-				<input name="eventSaturday" type="checkbox" {{checker:eventRunOn day='Saturday'}} value="1" /></td>
-			<td scope="col">
+			<td>
+				<input name="eventSun" type="checkbox" {{checker:eventRunOn day='Sunday'}} value="Y" /></td>
+			<td>
+				<input name="eventMon" type="checkbox" {{checker:eventRunOn day='Monday'}} value="Y" /></td>
+			<td>
+				<input name="eventTues" type="checkbox" {{checker:eventRunOn day='Tuesday'}} value="Y" /></td>
+			<td>
+				<input name="eventWed" type="checkbox" {{checker:eventRunOn day='Wednesday'}} value="Y" /></td>
+			<td>
+				<input name="eventThurs" type="checkbox" {{checker:eventRunOn day='Thursday'}} value="Y" /></td>
+			<td>
+				<input name="eventFri" type="checkbox" {{checker:eventRunOn day='Friday'}} value="Y" /></td>
+			<td>
+				<input name="eventSat" type="checkbox" {{checker:eventRunOn day='Saturday'}} value="Y" /></td>
+			<td>
 				<input alt="Save" type="submit" value="Save"/></td>
-			<td scope="col">
-				<input alt="Zone 1 On" id="eventStart" src="on24.png" style="width: 24px; height: 24px;" type="image" /></td>
-			<td scope="col">
-				<input alt="Zone 1 Off" id="eventStop" src="off24.png" style="width: 24px; height: 24px;" type="image" /></td>
+			<td>
+				<img alt="Zone {{>eventIdx}} On" name="zoneOn" src="on24.png" style="width: 24px; height: 24px;"/></td>
+			<td>
+				<img alt="Zone {{>eventIdx}} Off" name="zoneOff" src="off24.png" style="width: 24px; height: 24px;"/></td>
+			<td name="lastStart" class="lastStart" NOWRAP>
+				{{dateTime:lastStart}}
+			</td>
 		</form>
 		</tr>
+		{{/for}}
 	</script>
 
-	<script>
-	$(document).ajaxStart(function() {
-		$("#loading").show();
-	});
-	$(document).ajaxComplete(function() {
-		$("#loading").hide();
-	});
-	
-	function updateTips(tipHolder, t ) {
-		tips = tipHolder.find( "#validateTips" );
-		tips.text( t ).fadeIn("fast");
-		setTimeout(function() {
-			tips.fadeOut("slow");
-		}, 2000 );
-	}
-	
-	function checkRegexp( o, regexp, n, tipHolder ) {
-		if ( !( regexp.test( o.val() ) ) ) {
-			o.addClass( "ui-state-error" );
-			updateTips(tipHolder, n );
-			return false;
-		} else {
-			return true;
-		}
-    }
-
-	//var jsondata = [{eventIdx: 0, eventName: 'NAME_1_xxxxxxxxxxxxxxxxxxxxx321|', zoneNumber: 1, eventActive: 'Y', eventTime: '19:30', eventRuntime: 10, eventRunOn: 'YNYNYNN'}];
+	<script type="text/javascript">
+	//var jsondata = {"maxZones": 6, "events": [{"eventIdx": 0, "eventName: 'NAME_1_xxxxxxxxxxxxxxxxxxxxx321|', zoneNumber: 1, eventActive: 'Y', eventTime: '19:30', eventRuntime: 10, eventRunOn: 'YNYNYNN'}]};
 
 	$(function () {	
+	
+		$(document).ajaxStart(function() {
+			$("#loading").show();
+		});
+		$(document).ajaxComplete(function() {
+			$("#loading").hide();
+		});
+	
+		// Custom converters for use by JsRender template rendering
 		$.views.converters({
 			checker: function (value) {
 				var result = "";
@@ -249,35 +199,46 @@
 				}
 				return result;
 			},
-			selector: function (value) {
+			dateTime: function (value) {
 				var result = "";
-				var test = this.tagCtx.props.match;
-				if (
-					(test == "off" && value == "N")
-					|| (test == "1" && value == "1")
-					|| (test == "2" && value == "2")
-					|| (test == "3" && value == "3")
-					|| (test == "4" && value == "4")
-					|| (test == "5" && value == "5")
-					|| (test == "6" && value == "6")
-				) {
-					result = "SELECTED = 'SELECTED'";
+				if (value > 0) {
+					var dt = new Date(value * 1000);				
+					result = dt.getUTCMonth() + "/" + dt.getUTCDate() + " " + dt.getUTCHours() + ":" + dt.getUTCMinutes();
 				}
 				return result;
 			}
 		});
 		
-//			$("#eventTable").html(
-//				$("#eventTmpl").render(jsondata)
-//			);
-
-
-		$.getJSON('getevnts.do', {format: "json"}).done(function( jsondata ) {		
+		// We user JsRender to render the template defined by 'eventTmpl', above
+		$.getJSON('getevnts.do').done(function( jsondata ) {
+			//jsondata.zoneArray = zoneArray;
 			$("#eventTable").html(
 				$("#eventTmpl").render(jsondata)
 			);
+			var zonecount = jsondata.maxZones;
+			var ary = document.getElementsByName("zoneNumber");
+			// Loop over SELECT controls
+			for (j = 0; j < ary.length; j++) { 
+				var theSelect = $("#zoneNumber_" + j);
+				for (i = 0; i <= zonecount; i++) {	// add {zonecount} options to each select
+					if (i == 0)
+						optVal = 'off';
+					else
+						optVal = i;
+					if (jsondata.events[j].zoneNumber == i ) {
+						theSelect.append("<option value='" + optVal + "' SELECTED='SELECTED'>" + optVal + "</option>");
+					} else {
+						theSelect.append("<option value='" + optVal + "'>" + optVal + "</option>");
+					}
+					console.log( "Add option: " + optVal + ", " + j);
+				}
+			}
 						
 			$("form").submit(function(event) {
+				var nameField = this[1]; // the eventName input field
+				var nameStr = nameField.value;
+				nameStr = nameStr.trim()
+				nameField.value = nameStr;
 				var params = $(this).serialize();
 				$.ajax({
 					url: "saveevnt.do",
@@ -287,11 +248,50 @@
 					dataType: "text",
 					success: function(data){},
 					error:function(){
-						alert("Failed to contact WiWater controller");
+						alert("Failed to contact WiH20 controller");
 					}   
 				}); 
 				return false;
+			});	
+				
+			$("img[name='zoneOff']").click(function(event) {
+				var z = $(this).parent().parent().find("select[name='zoneNumber']").val();
+				$.ajax({
+					url: "setzone.do",
+					type: "get",
+					data: { zoneNum: z, zoneState: 0 },
+					timeout: 2000,
+					success: function(){
+						getStatus();
+					},
+					error:function(){
+						alert("Failed to contact WiH20 controller");
+					}   
+				}); 
 			});
+			
+			$("img[name='zoneOn']").click(function(event) {
+				var z = $(this).parent().parent().find("select[name='zoneNumber']").val();
+				$.ajax({
+					url: "setzone.do",
+					type: "get",
+					data: { zoneNum: z, zoneState: 1 },
+					timeout: 2000,
+					success: function(){
+						getStatus();
+					},
+					error:function(){
+						alert("Failed to contact WiH20 controller");
+					}   
+				}); 
+			});
+		})
+		.fail(function( jqxhr, textStatus, error ) {
+			var err = textStatus + ', ' + error;
+			console.log( "Request Failed: " + err);
+			$("#status").html("Not Responding");
+			$("#pgmStart").css({ opacity: 0.4 });
+			$("#pgmStop").css({ opacity: 0.4 });
 		});
 
 		$("[id^='zoneTime_']").change( function(event) {
@@ -322,7 +322,7 @@
 					dataType: "text",
 					success: function(data){},
 					error:function(){
-						alert("Failed to contact WiWater controller");
+						alert("Failed to contact WiH20 controller");
 					}   
 				}); 
 			} else
@@ -356,7 +356,7 @@
 					dataType: "text",
 					success: function(data){},
 					error:function(){
-						alert("Failed to contact WiWater controller");
+						alert("Failed to contact WiH20 controller");
 					}   
 				}); 
 			} else
@@ -398,7 +398,7 @@
 					getStatus();
 				},
 				error:function(){
-					alert("Failed to contact WiWater controller");
+					alert("Failed to contact WiH20 controller");
 				}   
 			}); 
 		}
@@ -415,35 +415,53 @@
 					getStatus();
 				},
 				error:function(){
-					alert("Failed to contact WiWater controller");
+					alert("Failed to contact WiH20 controller");
 				}   
 			}); 
 		}
 	});
+
 	
+	function updateTips(tipHolder, t ) {
+		tips = tipHolder.find( "#validateTips" );
+		tips.text( t ).fadeIn("fast");
+		setTimeout(function() {
+			tips.fadeOut("slow");
+		}, 2000 );
+	}
+	
+	function checkRegexp( o, regexp, n, tipHolder ) {
+		if ( !( regexp.test( o.val() ) ) ) {
+			o.addClass( "ui-state-error" );
+			updateTips(tipHolder, n );
+			return false;
+		} else {
+			return true;
+		}
+    }
+
 	function getStatus() {
-		$.getJSON("/getsts.do")
-			.done(function( json ) {
-				$("#status").html(json.status);
-				$("#time").html(json.time.substring(0,5));
-				if (json.status == "Running") {
-					$("#pgmStart").css({ opacity: 0.4 }).prop('disabled', true);
-					$("#pgmStop").css({ opacity: 1 }).prop('disabled', false);
-				} else if (json.status == "Paused") {
-					$("#pgmStart").css({ opacity: 1 }).prop('disabled', false);
-					$("#pgmStop").css({ opacity: 0.4 }).prop('disabled', true);
-				} else {
-					$("#pgmStart").css({ opacity: 0.4 });
-					$("#pgmStop").css({ opacity: 0.4 });
-				}
-			})
-			.fail(function( jqxhr, textStatus, error ) {
-				var err = textStatus + ', ' + error;
-				console.log( "Request Failed: " + err);
-				$("#status").html("Not Responding");
+		$.getJSON("/getsts.do").done(function( json ) {
+			$("#status").html(json.status);
+			$("#time").html(json.time.substring(0,5));
+			if (json.status == "Running") {
+				$("#pgmStart").css({ opacity: 0.4 }).prop('disabled', true);
+				$("#pgmStop").css({ opacity: 1 }).prop('disabled', false);
+			} else if (json.status == "Paused") {
+				$("#pgmStart").css({ opacity: 1 }).prop('disabled', false);
+				$("#pgmStop").css({ opacity: 0.4 }).prop('disabled', true);
+			} else {
 				$("#pgmStart").css({ opacity: 0.4 });
 				$("#pgmStop").css({ opacity: 0.4 });
-			});
+			}
+		})
+		.fail(function( jqxhr, textStatus, error ) {
+			var err = textStatus + ', ' + error;
+			console.log( "Request Failed: " + err);
+			$("#status").html("WiH20 not Responding");
+			$("#pgmStart").css({ opacity: 0.4 });
+			$("#pgmStop").css({ opacity: 0.4 });
+		});
 	}
 	
 	</script>

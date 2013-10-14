@@ -108,7 +108,7 @@ ZONE_INFO zones[MAX_EVENTS] = {
 // Format Zone data from SD card SCHED.TXT file will be:
 // ex: "01My Zone 1                       Y193020NNYNNNY"
 // Where	[32 character zone name]
-//			ZZ = Zone ID (01-MAX_EVENTS)
+//			ZZ = Zone ID (01-MAX_ZONES)
 //			A = Active (Y/N)
 //			HH = Hour (00-23)
 //			MM = Minute (00-23)
@@ -145,8 +145,6 @@ void ReadSerialBytes(char * buf, int bytes);
 void SerialCmdTask();
 void setupSprinklerPins();
 void checkForZoneAction(WrappedTime realtime);
-void turnOn(int pin);
-void turnOff(int pin);
 void loadTime();
 int sdReadln(File tFile, char *buff, int buffsz);
 
@@ -191,12 +189,11 @@ void loadConfig() {
 		schedFile.close();
 	}
 	
-	dumpZoneData();
+//	dumpZoneData();
 }
 
 void parseZoneData(char* data, int zoneNum) {
 	strncpy(zones[zoneNum].name, data, 32);
-	zones[zoneNum].name[32] = 0;
 	// zone number
 	strncpy(intHolder, data + 33, 2); intHolder[2] = 0;
 	zones[zoneNum].zone = (int)strtol(intHolder, NULL, 10);
@@ -221,7 +218,7 @@ void parseZoneData(char* data, int zoneNum) {
 }
 
 void saveConfig() {
-        char name[33];
+	///char name[32];
 	if (SD.exists("sched.txt")) {
 	     SD.remove("sched.txt");
 	}
@@ -229,12 +226,16 @@ void saveConfig() {
 	// if the file opened okay, write to it:
 	if (schedFile) {
 		for (int i = 0; i < MAX_EVENTS; i++) {
-			strcpy(name, "                                ");
-			strncpy(name, zones[i].name, 32);
-			sprintf(zoneBuffer, "%32s%02d%c%02d%02d%02d%c%c%c%c%c%c%c", name, zones[i].zone, zones[i].active, zones[i].hour, 
+			//strcpy(name, "                                ");
+			strncpy(buffer, zones[i].name, 32);
+			buffer[32] = 0;
+//Serial.print(zones[i].name);Serial.print("*");Serial.println();
+//Serial.print(buffer);Serial.print("*");Serial.println();
+//Serial.print("zoneBuffer before: ");Serial.println(zoneBuffer);
+			sprintf(zoneBuffer, "%-32s%02d%c%02d%02d%02d%c%c%c%c%c%c%c", buffer, zones[i].zone, zones[i].active, zones[i].hour, 
 				zones[i].minute, zones[i].runTime, zones[i].runOnDay[0], zones[i].runOnDay[1], zones[i].runOnDay[2], 
 				zones[i].runOnDay[3], zones[i].runOnDay[4], zones[i].runOnDay[5], zones[i].runOnDay[6]);
-			zoneBuffer[ZONE_DATA_LENGTH] = 0;
+//Serial.print("zoneBuffer after: ");Serial.println(zoneBuffer);
 			schedFile.println(zoneBuffer);
 		}
 		schedFile.close();
@@ -282,6 +283,10 @@ void AppInit() {
 	intHolder[2] = 0;
 	pgmStatus = szPgmStsRunning;
 
+	// Print date and time
+	ClockGetShortDateTimeString(buffer, ClockGetTime());
+	Serial.println(buffer);
+	
 	/* Set up the pin used for heartbeat status output.
 	*/
 	pinMode(pinLedStatus, OUTPUT);		//heartbeat LED
@@ -397,7 +402,7 @@ void AppTask() {
 		ClockGetShortTimeString(nowString, realtime);
 
 		if (strcmp(pgmStatus, szPgmStsRunning) == 0 && strcmp(lasttimestr, nowString) != 0) {
-			ClockPrintTime();
+			//ClockPrintTime();
 			checkForZoneAction(realtime);
 		}
 		strcpy(lasttimestr, nowString);
@@ -458,8 +463,6 @@ void ReadSerialBytes(char * buf, int bytes) {
 
 void checkForZoneAction(WrappedTime realtime) {
 	for (int i = 0; i < MAX_EVENTS; i++) {
-Serial.print(i, DEC);	Serial.print("  ");			
-Serial.print(zones[i].runOnDay[6]);Serial.print(", ");Serial.print(realtime.week, DEC);Serial.print(", ");Serial.print(SATURDAY, DEC);Serial.println(zones[i].minute, DEC);
 		// Check for zones to turn on
 		// First, is it not already on, is it active and does it run on this day?
 		if (zones[i].active == 'Y' 
@@ -474,14 +477,11 @@ Serial.print(zones[i].runOnDay[6]);Serial.print(", ");Serial.print(realtime.week
 			|| (zones[i].runOnDay[6] == 'Y' && realtime.week == SATURDAY)
 			)
 		) { 
-Serial.print(zones[i].hour, DEC);Serial.print(":");Serial.println(zones[i].minute, DEC);
 		
 			// OK, is it time?
 			if (zones[i].hour == realtime.hour && zones[i].minute ==realtime.minute) {
 				// TURN IT ON!
-				zones[i].currentState = 1;
-				zones[i].lastStart = now();
-				turnOn(i + FIRST_VALVE_PIN);
+				turnOn(i);
 			}
 		} //end check for on
 		
@@ -490,8 +490,7 @@ Serial.print(zones[i].hour, DEC);Serial.print(":");Serial.println(zones[i].minut
 			// On long enough?
 			if (now() > (zones[i].lastStart + ((zones[i].runTime) * 60))) {
 				// TURN IT OFF!
-				turnOff(i + FIRST_VALVE_PIN);
-				zones[i].currentState = 0;
+				turnOff(i);
 			}
 		}
 		
@@ -500,37 +499,53 @@ Serial.print(zones[i].hour, DEC);Serial.print(":");Serial.println(zones[i].minut
 			// On long enough?
 			if (now() > (zones[i].lastStart + (99 * 60))) {
 				// TURN IT OFF!
-				turnOff(i + 2);
-				zones[i].currentState = 0;
+				turnOff(i);
 			}
 		}
 	}
 }
 
-void turnOff(int pin) {
-	if (INVERT_MASTER_PIN == 'Y')
+void turnOff(int zone) {
+	zones[zone].currentState = 0;
+#if defined(USE_MASTER_VALVE)
+	if (INVERT_MASTER_PIN == 'Y') {
 		digitalWrite(MASTER_VALVE_PIN, HIGH);
-	else
+		Serial.print(MASTER_VALVE_PIN);Serial.println(" ON!");				
+	} else {
 		digitalWrite(MASTER_VALVE_PIN, LOW);
-
-	if (INVERT_PINS == 'Y')
-		digitalWrite(pin, HIGH);
-	else
-		digitalWrite(pin, LOW);
-Serial.print(pin);Serial.println(" OFF!");				
+		Serial.print(MASTER_VALVE_PIN);Serial.println(" OFF!");				
+	}
+#endif
+				 
+	if (INVERT_PINS == 'Y') {
+		digitalWrite((zone + FIRST_VALVE_PIN), HIGH);
+		Serial.print((zone + FIRST_VALVE_PIN), DEC);Serial.println(" ON!");				
+	} else {
+		digitalWrite((zone + FIRST_VALVE_PIN), LOW);
+		Serial.print((zone + FIRST_VALVE_PIN), DEC);Serial.println(" OFF!");				
+	}
 }
 
-void turnOn(int pin) {
-	if (INVERT_MASTER_PIN == 'Y')
+void turnOn(int zone) {
+	zones[zone].currentState = 1;
+	zones[zone].lastStart = now();
+#if defined(USE_MASTER_VALVE)
+	if (INVERT_MASTER_PIN == 'Y') {
 		digitalWrite(MASTER_VALVE_PIN, LOW);
-	else
+		Serial.print(MASTER_VALVE_PIN);Serial.println(" OFF!");				
+	} else {
 		digitalWrite(MASTER_VALVE_PIN, HIGH);
+		Serial.print(MASTER_VALVE_PIN);Serial.println(" ON!");				
+	}
+#endif
 
-	if (INVERT_PINS == 'Y')
-		digitalWrite(pin, LOW);
-	else
-		digitalWrite(pin, HIGH);
-Serial.print(pin);Serial.println(" Pin ON!");				
+	if (INVERT_PINS == 'Y') {
+		digitalWrite((zone + FIRST_VALVE_PIN), LOW);
+		Serial.print((zone + FIRST_VALVE_PIN), DEC);Serial.println(" OFF!");				
+	} else {
+		digitalWrite((zone + FIRST_VALVE_PIN), HIGH);
+		Serial.print((zone + FIRST_VALVE_PIN), DEC);Serial.println(" ON!");				
+	}
 }
 
 void saveTime() {

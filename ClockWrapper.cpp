@@ -148,6 +148,9 @@ void ClockSetDate(char * buffer) {
 	t.day = (int)strtol(intBuffer, NULL, 10);
 	strncpy(intBuffer, buffer+6, 2);
 	t.year = (int)strtol(intBuffer, NULL, 10);
+#if defined(RTCC_DS1302)
+	t.week = DayOfWeek(t.day, t.month, t.year);
+#endif
 	ClockSet(t);
 }
 
@@ -297,9 +300,16 @@ void ClockGetMonthStr(char * buf, WrappedTime time, uint8_t format) {
 	dsTime.second = time.second;
 	return dsTime;
   }
+  
 #elif defined (RTCC_PIC32)
 #endif
 
+int DayOfWeek(int d, int m, int y) {
+	static int t[] = { 0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4 };
+	y -= m < 3;
+	return ( y + y/4 - y/100 + y/400 + t[m-1] + d) % 7;
+}
+ 
 long now() {
 	WrappedTime tm = ClockGetTime();
 	int i;

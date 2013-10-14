@@ -1022,8 +1022,8 @@ HttpTask()
 			** won't be a message body. In response to a GET request
 			** we need to send the requested resource.
 			*/
+			Serial.println();
 			errHttpRequest = errParse;
-	Serial.println("Rendering page");
 			if (errHttpRequest == errOK) {
 				if (idresRequest == idresFile) {
 					sthCur = sthBeginFileTransfer;
@@ -1039,6 +1039,11 @@ HttpTask()
 				sthCur = sthIdle;
 				msClientActivity = millis();
 				break;
+			}
+			else if (errHttpRequest == errNotFound) {
+				idresRequest = idres404;
+				sthCur = sthSendLocalResource;
+				break;				
 			}
 			else {
 				sthCur = sthIdle;

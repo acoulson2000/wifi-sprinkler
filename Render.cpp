@@ -104,6 +104,7 @@ void RenderStatusPage();
 void putCacheHeaders();
 void RenderEventListPage();
 void RenderOKPage();
+void Render404Page();
 
 /* ------------------------------------------------------------ */
 /*				Procedure Definitions							*/
@@ -301,6 +302,10 @@ void PutResponseBody() {
 			RenderOKPage();
 			break;
 			
+		case idres404:
+			Render404Page();
+			break;
+			
 		case idresEventList:
 			RenderEventListPage();
 			break;
@@ -406,17 +411,20 @@ void RenderStatusPage() {
 void RenderEventListPage() {
 	DNETcK::setDefaultBlockTime(5000);
     //[{eventIdx: 1, eventName: 'Foobar1'}, {eventIdx: 2, eventName: 'Foobar2'}];
-	tcpClient.println("[");
+	tcpClient.print("{\"maxZones\": ");
+	sprintf( stsBuf, "%d", MAX_ZONES );
+	tcpClient.print(stsBuf);
+	tcpClient.println(",\n \"events\": [");
 	for (int i = 0; i < MAX_EVENTS; i++) {
 		if (i > 0) 	tcpClient.println(",");
 		stsBuf[0] = 0;
 		sprintf(
 			stsBuf, 
-			"{\"eventIdx\": %d, \"eventName\": \"%s\", \"zoneNumber\": %d, \"eventActive\": \"%c\", \"eventTime\": \"%02d:%02d\", \"eventRuntime\": %d, \"eventRunOn\": \"%s\"}",
-			i, zones[i].name, zones[i].zone, zones[i].active, zones[i].hour, zones[i].minute, zones[i].runTime, zones[i].runOnDay);
+			"\t{\"eventIdx\": %d, \"eventName\": \"%s\", \"zoneNumber\": %d, \"eventActive\": \"%c\", \"eventTime\": \"%02d:%02d\", \"eventRuntime\": %d, \"eventRunOn\": \"%s\", \"lastStart\": \"%d\"}",
+			i, zones[i].name, zones[i].zone, zones[i].active, zones[i].hour, zones[i].minute, zones[i].runTime, zones[i].runOnDay, zones[i].lastStart);
 		tcpClient.println(stsBuf);
 	}
-	tcpClient.println("]");
+	tcpClient.println("]}");
 
 	DNETcK::setDefaultBlockTime(DNETcK::msImmediate);
 }
@@ -424,6 +432,12 @@ void RenderEventListPage() {
 void RenderOKPage() {
 	DNETcK::setDefaultBlockTime(1000);
 	tcpClient.println("OK");
+	DNETcK::setDefaultBlockTime(DNETcK::msImmediate);
+}
+
+void Render404Page() {
+	DNETcK::setDefaultBlockTime(5000);   
+	tcpClient.print(sz404Page);
 	DNETcK::setDefaultBlockTime(DNETcK::msImmediate);
 }
 

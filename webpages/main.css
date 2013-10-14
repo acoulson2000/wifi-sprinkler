@@ -15,12 +15,12 @@ td {
 }
 
 .main {
-	width: 800px;
+	width: 850px;
 	background: white;
 	box-shadow: rgba(0, 0, 0, 0.5) 5px 5px 5px 5px;
 }
 .banner {
-	width: 800px;
+	width: 850px;
 	display:inline-block;
 	box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 9px 0px;
 }
@@ -43,6 +43,11 @@ td {
 
 .schedule {
 	margin: 10px 10px 10px 10px;
+}
+
+.lastStart {
+	font-family: verdana, Helvetica, Arial, sans-serif;
+	font-size: 8pt;
 }
 
 #timePopup, #datePopup, #startPopup {

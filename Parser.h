@@ -35,6 +35,7 @@
 #define idresSaveEvent		7
 #define	idresLedForm		8
 #define	idresFile			9
+#define	idres404			10
 
 /* Resource names.
 */
@@ -43,6 +44,7 @@
 #define	szResStatusPage		"/getsts.do"
 #define	szResSetStatus		"/setsts.do"
 #define	szResSaveEvent		"/saveevnt.do"
+#define	szResSetZoneState	"/setzone.do"
 #define	szResGetEvents		"/getevnts.do"
 #define	szResSetTime		"/settime.do"
 

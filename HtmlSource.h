@@ -75,6 +75,7 @@ extern char szHeaderCache[];
 
 extern char	szHomePage[];
 extern char	szStatusPage[];
+extern char	sz404Page[];
 
 extern char	szHtmlBr[];
 extern char	szHtmlHr[];

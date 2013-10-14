@@ -104,6 +104,10 @@ char szStatusPage[] = {
 	"{\"status\": \"%s\", \"date\": \"%s\", \"time\": \"%s\"}"
 };
 
+char sz404Page[] = {
+"<html>\r\n<head><title>HTTP 404 Not Found</title></head>\r\n<strong>404 - Requested resource not found.</strong><br/>\r\n Is SD card installed?\r\n</html>\r\n"
+};
+
 /* These are some simple snipets of HTML for line formatting.
 */
 char szHtmlBr[] = { "<br />\r\n" };		//HTML break tag
