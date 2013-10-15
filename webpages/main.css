@@ -15,12 +15,12 @@ td {
 }
 
 .main {
-	width: 850px;
+	width: 900px;
 	background: white;
 	box-shadow: rgba(0, 0, 0, 0.5) 5px 5px 5px 5px;
 }
 .banner {
-	width: 850px;
+	width: 900px;
 	display:inline-block;
 	box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 9px 0px;
 }
