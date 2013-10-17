@@ -287,8 +287,8 @@ extern uint8_t	rgbFileBuf[];
 #if defined(USING_WIFI)
 
 //***DLC
-char * szSSID       = "coulson2b";			// the name of the network to connect to
-char * szPassPhrase	= "0717640717";			// pass phrase to use with WPA2
+char * szSSID       = "yourssid";			// the name of the network to connect to
+char * szPassPhrase	= "yourpassphrase";			// pass phrase to use with WPA2
 											//   has no meaning if using open security
 int	conID			= DWIFIcK::INVALID_CONNECTION_ID; 
      
@@ -1001,7 +1001,7 @@ HttpTask()
 			/* Process the header line in the input buffer.
 			*/
 			if (cchLineCur != 0) {
-				Serial.println(szLineBuffer);
+				//Serial.println(szLineBuffer);
 				InitLineParse(szLineBuffer);
 				ParseHttpHeader();
 				sthCur = sthWaitHeaderLine;
@@ -1022,7 +1022,7 @@ HttpTask()
 			** won't be a message body. In response to a GET request
 			** we need to send the requested resource.
 			*/
-			Serial.println();
+			//Serial.println();
 			errHttpRequest = errParse;
 			if (errHttpRequest == errOK) {
 				if (idresRequest == idresFile) {

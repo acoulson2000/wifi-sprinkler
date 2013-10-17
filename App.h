@@ -61,6 +61,8 @@ extern char	szPgmStsRunning[];
 extern char	szPgmStsPaused[];
 
 extern char *		pgmStatus;
+extern bool			forcedOn[];
+extern bool			forcedOff[];
 
 typedef struct {
   char		name[33];
@@ -80,7 +82,9 @@ typedef struct {
 void loadConfig();
 void saveConfig();
 void saveTime();
-void turnOn(int pin);
-void turnOff(int pin);
+void turnOn(int zone);
+void turnOff(int zone);
+void manualOn(int zone);
+void manualOff(int zone);
 
 #endif	// _APP_H

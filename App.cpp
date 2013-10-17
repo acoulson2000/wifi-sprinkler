@@ -76,13 +76,18 @@ const int    pinLedStatus = 6;
 /* ------------------------------------------------------------ */
 
 bool	fSDfs = false;	// true if we have an SD file system
+bool	forcedOn[20] = {false, false, false, false, false, false, false, false, false, false,
+						false, false, false, false, false, false, false, false, false, false};	// make sure you have at least as many as MAX_ZONES specifies
+
+bool	forcedOff[20] = {false, false, false, false, false, false, false, false, false, false,
+						false, false, false, false, false, false, false, false, false, false};	// make sure you have at least as many as MAX_ZONES specifies
 
 /* ------------------------------------------------------------ */
 /*				Local Variables									*/
 /* ------------------------------------------------------------ */
-// Can only handle 5 on Arduino Uno
+// Can only handle 5 on Arduino Uno due to memory limits.
 // Maybe 10 or 20 on Mega/chipKIT?
-ZONE_INFO zones[MAX_EVENTS] = {
+ZONE_INFO events[MAX_EVENTS] = {
   {"Event 1                         ",0,'N',0,0,0,0,0,"NNNNNNN"}, 
   {"Event 2                         ",0,'N',0,0,0,0,0,"NNNNNNN"}, 
   {"Event 3                         ",0,'N',0,0,0,0,0,"NNNNNNN"}, 
@@ -193,28 +198,28 @@ void loadConfig() {
 }
 
 void parseZoneData(char* data, int zoneNum) {
-	strncpy(zones[zoneNum].name, data, 32);
+	strncpy(events[zoneNum].name, data, 32);
 	// zone number
 	strncpy(intHolder, data + 33, 2); intHolder[2] = 0;
-	zones[zoneNum].zone = (int)strtol(intHolder, NULL, 10);
+	events[zoneNum].zone = (int)strtol(intHolder, NULL, 10);
 	// active flag
-	zones[zoneNum].active = data[34];
+	events[zoneNum].active = data[34];
 	// start hour
 	strncpy(intHolder, data + 35, 2); intHolder[2] = 0;
-	zones[zoneNum].hour = (int)strtol(intHolder, NULL, 10);
+	events[zoneNum].hour = (int)strtol(intHolder, NULL, 10);
 	// start minute
 	strncpy(intHolder, data + 37, 2); intHolder[2] = 0;
-	zones[zoneNum].minute = (int)strtol(intHolder, NULL, 10);
+	events[zoneNum].minute = (int)strtol(intHolder, NULL, 10);
 	// run time
 	strncpy(intHolder, data + 39, 2); intHolder[2] = 0;
-	zones[zoneNum].runTime = (int)strtol(intHolder, NULL, 10);
-	zones[zoneNum].runOnDay[0] = data[41];
-	zones[zoneNum].runOnDay[1] = data[42];
-	zones[zoneNum].runOnDay[2] = data[43];
-	zones[zoneNum].runOnDay[3] = data[44];
-	zones[zoneNum].runOnDay[4] = data[45];
-	zones[zoneNum].runOnDay[5] = data[46];
-	zones[zoneNum].runOnDay[6] = data[47];
+	events[zoneNum].runTime = (int)strtol(intHolder, NULL, 10);
+	events[zoneNum].runOnDay[0] = data[41];
+	events[zoneNum].runOnDay[1] = data[42];
+	events[zoneNum].runOnDay[2] = data[43];
+	events[zoneNum].runOnDay[3] = data[44];
+	events[zoneNum].runOnDay[4] = data[45];
+	events[zoneNum].runOnDay[5] = data[46];
+	events[zoneNum].runOnDay[6] = data[47];
 }
 
 void saveConfig() {
@@ -227,14 +232,14 @@ void saveConfig() {
 	if (schedFile) {
 		for (int i = 0; i < MAX_EVENTS; i++) {
 			//strcpy(name, "                                ");
-			strncpy(buffer, zones[i].name, 32);
+			strncpy(buffer, events[i].name, 32);
 			buffer[32] = 0;
-//Serial.print(zones[i].name);Serial.print("*");Serial.println();
+//Serial.print(events[i].name);Serial.print("*");Serial.println();
 //Serial.print(buffer);Serial.print("*");Serial.println();
 //Serial.print("zoneBuffer before: ");Serial.println(zoneBuffer);
-			sprintf(zoneBuffer, "%-32s%02d%c%02d%02d%02d%c%c%c%c%c%c%c", buffer, zones[i].zone, zones[i].active, zones[i].hour, 
-				zones[i].minute, zones[i].runTime, zones[i].runOnDay[0], zones[i].runOnDay[1], zones[i].runOnDay[2], 
-				zones[i].runOnDay[3], zones[i].runOnDay[4], zones[i].runOnDay[5], zones[i].runOnDay[6]);
+			sprintf(zoneBuffer, "%-32s%02d%c%02d%02d%02d%c%c%c%c%c%c%c", buffer, events[i].zone, events[i].active, events[i].hour, 
+				events[i].minute, events[i].runTime, events[i].runOnDay[0], events[i].runOnDay[1], events[i].runOnDay[2], 
+				events[i].runOnDay[3], events[i].runOnDay[4], events[i].runOnDay[5], events[i].runOnDay[6]);
 //Serial.print("zoneBuffer after: ");Serial.println(zoneBuffer);
 			schedFile.println(zoneBuffer);
 		}
@@ -245,19 +250,19 @@ void saveConfig() {
 void dumpZoneData() {
 	Serial.println(MAX_EVENTS, DEC);
 	for (int i = 0; i < MAX_EVENTS; i++) { 
-		Serial.print(zones[i].name);
-		Serial.print(zones[i].zone, DEC);
-		Serial.print(zones[i].active);
-		Serial.print(zones[i].hour, DEC);
-		Serial.print(zones[i].minute, DEC);
-		Serial.print(zones[i].runTime, DEC);
-		Serial.print(zones[i].runOnDay[0]);
-		Serial.print(zones[i].runOnDay[1]);
-		Serial.print(zones[i].runOnDay[2]);
-		Serial.print(zones[i].runOnDay[3]);
-		Serial.print(zones[i].runOnDay[4]);
-		Serial.print(zones[i].runOnDay[5]);
-		Serial.print(zones[i].runOnDay[6]);
+		Serial.print(events[i].name);
+		Serial.print(events[i].zone, DEC);
+		Serial.print(events[i].active);
+		Serial.print(events[i].hour, DEC);
+		Serial.print(events[i].minute, DEC);
+		Serial.print(events[i].runTime, DEC);
+		Serial.print(events[i].runOnDay[0]);
+		Serial.print(events[i].runOnDay[1]);
+		Serial.print(events[i].runOnDay[2]);
+		Serial.print(events[i].runOnDay[3]);
+		Serial.print(events[i].runOnDay[4]);
+		Serial.print(events[i].runOnDay[5]);
+		Serial.print(events[i].runOnDay[6]);
 		Serial.println();
 	}
 }
@@ -464,49 +469,65 @@ void ReadSerialBytes(char * buf, int bytes) {
 void checkForZoneAction(WrappedTime realtime) {
 	for (int i = 0; i < MAX_EVENTS; i++) {
 		// Check for zones to turn on
-		// First, is it not already on, is it active and does it run on this day?
-		if (zones[i].active == 'Y' 
-			&& zones[i].currentState != 1
+		// First, if the event's zone was manually forced off while running, and 'duration'
+		
+		// OK, now if it is not already on, is it active and does it run on this day?
+		if (events[i].active == 'Y' 
+			&& events[i].currentState != 1
 			&& 
-			( (zones[i].runOnDay[0] == 'Y' && realtime.week == SUNDAY)
-			|| (zones[i].runOnDay[1] == 'Y' && realtime.week == MONDAY)
-			|| (zones[i].runOnDay[2] == 'Y' && realtime.week == TUESDAY)
-			|| (zones[i].runOnDay[3] == 'Y' && realtime.week == WEDNESDAY)
-			|| (zones[i].runOnDay[4] == 'Y' && realtime.week == THURSDAY)
-			|| (zones[i].runOnDay[5] == 'Y' && realtime.week == FRIDAY)
-			|| (zones[i].runOnDay[6] == 'Y' && realtime.week == SATURDAY)
+			( (events[i].runOnDay[0] == 'Y' && realtime.week == SUNDAY)
+			|| (events[i].runOnDay[1] == 'Y' && realtime.week == MONDAY)
+			|| (events[i].runOnDay[2] == 'Y' && realtime.week == TUESDAY)
+			|| (events[i].runOnDay[3] == 'Y' && realtime.week == WEDNESDAY)
+			|| (events[i].runOnDay[4] == 'Y' && realtime.week == THURSDAY)
+			|| (events[i].runOnDay[5] == 'Y' && realtime.week == FRIDAY)
+			|| (events[i].runOnDay[6] == 'Y' && realtime.week == SATURDAY)
 			)
 		) { 
 		
 			// OK, is it time?
-			if (zones[i].hour == realtime.hour && zones[i].minute ==realtime.minute) {
-				// TURN IT ON!
-				turnOn(i);
+			if ( events[i].hour == realtime.hour && events[i].minute == realtime.minute ) {
+				// Need to prevent a zone turning right back on if it was turned off manually
+				// at the beginning of an event cycle.
+				// If it WAS forced off, but NOT during the run duration of the event,
+				// turn it ON.
+				if (  forcedOff[events[i].zone] && (now() > (events[i].lastStart + ((events[i].runTime) * 60))) ) {
+					turnOn(events[i].zone);
+					events[i].currentState = 1;
+					events[i].lastStart = now();
+					forcedOn[events[i].zone] = false;			// make sure forcedOn flag is off, otherwise runtime isn't respected
+					forcedOff[events[i].zone] = false;
+				}
 			}
 		} //end check for on
 		
 		// Any to turn off?
-		if (zones[i].active == 'Y' && zones[i].currentState == 1) {
+		if (events[i].active == 'Y' && events[i].currentState == 1) {
 			// On long enough?
-			if (now() > (zones[i].lastStart + ((zones[i].runTime) * 60))) {
+			if ( !forcedOn[events[i].zone] && (now() > (events[i].lastStart + ((events[i].runTime) * 60))) ) {
 				// TURN IT OFF!
-				turnOff(i);
+				turnOff(events[i].zone);
+				events[i].currentState = 0;
+				forcedOn[events[i].zone] = false;	// reset forced flags just to be safe
+				forcedOff[events[i].zone] = false;
 			}
 		}
 		
 		// NO zone should be on over 99 minutes
-		if (zones[i].currentState == 1) {
+		if (events[i].currentState == 1) {
 			// On long enough?
-			if (now() > (zones[i].lastStart + (99 * 60))) {
+			if (now() > (events[i].lastStart + (99 * 60))) {
 				// TURN IT OFF!
-				turnOff(i);
+				turnOff(events[i].zone);
+				events[i].currentState = 0;
+				forcedOn[events[i].zone] = false;
+				forcedOff[events[i].zone] = false;
 			}
 		}
 	}
 }
 
 void turnOff(int zone) {
-	zones[zone].currentState = 0;
 #if defined(USE_MASTER_VALVE)
 	if (INVERT_MASTER_PIN == 'Y') {
 		digitalWrite(MASTER_VALVE_PIN, HIGH);
@@ -518,17 +539,15 @@ void turnOff(int zone) {
 #endif
 				 
 	if (INVERT_PINS == 'Y') {
-		digitalWrite((zone + FIRST_VALVE_PIN), HIGH);
-		Serial.print((zone + FIRST_VALVE_PIN), DEC);Serial.println(" ON!");				
+		digitalWrite((zone + FIRST_VALVE_PIN - 1), HIGH);
+		Serial.print(zone, DEC);Serial.print(" ON! pin ");Serial.println((zone + FIRST_VALVE_PIN - 1), DEC);				
 	} else {
-		digitalWrite((zone + FIRST_VALVE_PIN), LOW);
-		Serial.print((zone + FIRST_VALVE_PIN), DEC);Serial.println(" OFF!");				
+		digitalWrite((zone + FIRST_VALVE_PIN - 1), LOW);
+		Serial.print(zone, DEC);Serial.print(" OFF! pin ");Serial.println((zone + FIRST_VALVE_PIN - 1), DEC);				
 	}
 }
 
 void turnOn(int zone) {
-	zones[zone].currentState = 1;
-	zones[zone].lastStart = now();
 #if defined(USE_MASTER_VALVE)
 	if (INVERT_MASTER_PIN == 'Y') {
 		digitalWrite(MASTER_VALVE_PIN, LOW);
@@ -540,12 +559,24 @@ void turnOn(int zone) {
 #endif
 
 	if (INVERT_PINS == 'Y') {
-		digitalWrite((zone + FIRST_VALVE_PIN), LOW);
-		Serial.print((zone + FIRST_VALVE_PIN), DEC);Serial.println(" OFF!");				
+		digitalWrite((zone + FIRST_VALVE_PIN - 1), LOW);
+		Serial.print(zone, DEC);Serial.print(" OFF! pin ");Serial.println((zone + FIRST_VALVE_PIN - 1), DEC);				
 	} else {
-		digitalWrite((zone + FIRST_VALVE_PIN), HIGH);
-		Serial.print((zone + FIRST_VALVE_PIN), DEC);Serial.println(" ON!");				
+		digitalWrite((zone + FIRST_VALVE_PIN - 1), HIGH);
+		Serial.print(zone, DEC);Serial.print(" ON! pin ");Serial.println((zone + FIRST_VALVE_PIN - 1), DEC);				
 	}
+}
+
+void manualOff(int zone) {
+	forcedOff[zone] = true;
+	forcedOn[zone] = false;
+	turnOff(zone);
+}
+
+void manualOn(int zone) {
+	forcedOff[zone] = false;
+	forcedOn[zone] = true;
+	turnOn(zone);
 }
 
 void saveTime() {

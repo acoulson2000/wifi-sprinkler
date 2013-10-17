@@ -73,7 +73,7 @@ extern uint8_t	rgvalLedState[];
 extern bool	fSDfs;
 extern File	fhData;
 
-extern ZONE_INFO zones[MAX_EVENTS] ;
+extern ZONE_INFO events[MAX_EVENTS] ;
 
 /* ------------------------------------------------------------ */
 /*				Local Variables									*/
@@ -646,7 +646,7 @@ void ParseSetTime() {
 **	Description:
 **		The URL for the form GET request looks like this:
 **
-**		/setzone.do?zoneNum=0&zoneState=1 (where zoneState= 0 or 1 for off or on)
+**		/setzone.do?eventIdx=0&zoneState=1 (where zoneState= 0 or 1 for off or on)
 */
 void ParseSetZone() {
 	int			eventIdx = 0;
@@ -655,14 +655,17 @@ void ParseSetZone() {
 		/* Get the next NAME, VALUE pair from the line */
 		ParseFormParameter(szParamName, szParamValue);
 
-		if (stricmp(szParamName, "zoneNum") == 0) {
+		if (stricmp(szParamName, "eventIdx") == 0) {
 			eventIdx = atoi(szParamValue);
 		} else if (stricmp(szParamName, "zoneState") == 0) {
 //Serial.print("setzone: "); Serial.print(eventIdx); Serial.println(atoi(szParamValue), DEC);
 			if (atoi(szParamValue) == 0) {
-				turnOff(eventIdx-1);
+				events[eventIdx].currentState = 0;
+				manualOff(events[eventIdx].zone);
 			} else if (atoi(szParamValue) == 1)  {
-				turnOn(eventIdx-1);
+				events[eventIdx].currentState = 1;
+				events[eventIdx].lastStart = now();
+				manualOn(events[eventIdx].zone);
 			}
 		} else {
 			/* Have an invalid parameter name. */
@@ -775,24 +778,24 @@ void ParseSaveEvt() {
 	}
 
 	//urldecode(decodedName, eventName);
-	strncpy(zones[eventIdx].name, eventName, 32);zones[eventIdx].name[33] = 0;
+	strncpy(events[eventIdx].name, eventName, 32);events[eventIdx].name[33] = 0;
 	if (zoneNum > 0) {
-		zones[eventIdx].active = 'Y';
-		zones[eventIdx].zone = zoneNum;
+		events[eventIdx].active = 'Y';
+		events[eventIdx].zone = zoneNum;
 	} else {
-		zones[eventIdx].active = 'N';
-		zones[eventIdx].zone = 0;
+		events[eventIdx].active = 'N';
+		events[eventIdx].zone = 0;
 	}
-	zones[eventIdx].hour = eventStartHour;
-	zones[eventIdx].minute = eventStartMinute;
-	zones[eventIdx].runTime = eventRuntime;
-	zones[eventIdx].runOnDay[0] = eventSunday;
-	zones[eventIdx].runOnDay[1] = eventMonday;
-	zones[eventIdx].runOnDay[2] = eventTuesday;
-	zones[eventIdx].runOnDay[3] = eventWednesday;
-	zones[eventIdx].runOnDay[4] = eventThursday;
-	zones[eventIdx].runOnDay[5] = eventFriday;
-	zones[eventIdx].runOnDay[6] = eventSaturday;
+	events[eventIdx].hour = eventStartHour;
+	events[eventIdx].minute = eventStartMinute;
+	events[eventIdx].runTime = eventRuntime;
+	events[eventIdx].runOnDay[0] = eventSunday;
+	events[eventIdx].runOnDay[1] = eventMonday;
+	events[eventIdx].runOnDay[2] = eventTuesday;
+	events[eventIdx].runOnDay[3] = eventWednesday;
+	events[eventIdx].runOnDay[4] = eventThursday;
+	events[eventIdx].runOnDay[5] = eventFriday;
+	events[eventIdx].runOnDay[6] = eventSaturday;
 
 	saveConfig();
 	//dumpZoneData();

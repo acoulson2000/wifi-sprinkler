@@ -28,7 +28,7 @@
 			<div class="banner">
 				<div class="heading">WiH2O <img src="spinner1.gif" id="loading" style="display:none"/></div>
 				<div class="timestamp">
-					<div id="date">07/10/13</div>
+					<div id="date">mm/dd/yy</div>
 					<div id="time">hh:mm</div>
 					<div id="timePopup">
 						<div style="height:20px">
@@ -76,8 +76,8 @@
 							<th>Fri</th>
 							<th>Sat</th>
 							<th></th>
-							<th colspan="2">Immediate</th>
-							<th>Last Ran</th>
+							<th colspan="2">Manual</br>Action</th>
+							<th width="75px">Last Ran</th>
 						</tr>
 					</thead>
 					<tbody id="eventTable">
@@ -113,7 +113,8 @@
 								<img alt="Zone 1 On" name="zoneOn" src="on24.png" style="width: 24px; height: 24px;"/></td>
 							<td>
 								<img alt="Zone 1 Off" name="zoneOff" src="off24.png" style="width: 24px; height: 24px;"/></td>
-							<td></td>
+							<td class="lastStart" NOWRAP>
+							</td>
 						</form>
 						</tr>
 					</tbody>
@@ -161,8 +162,8 @@
 				<img alt="Zone {{>eventIdx}} On" name="zoneOn" src="on24.png" style="width: 24px; height: 24px;"/></td>
 			<td>
 				<img alt="Zone {{>eventIdx}} Off" name="zoneOff" src="off24.png" style="width: 24px; height: 24px;"/></td>
-			<td name="lastStart" class="lastStart" NOWRAP>
-				{{dateTime:lastStart}}
+			<td NOWRAP>
+				<div name="lastStart" class="lastStart" >{{dateTime:lastStart}}</div>
 			</td>
 		</form>
 		</tr>
@@ -203,7 +204,7 @@
 				var result = "";
 				if (value > 0) {
 					var dt = new Date(value * 1000);				
-					result = dt.getUTCMonth() + "/" + dt.getUTCDate() + " " + dt.getUTCHours() + ":" + dt.getUTCMinutes();
+					result = (dt.getUTCMonth()+1) + "/" + dt.getUTCDate() + " " + dt.getUTCHours() + ":" + dt.getUTCMinutes();
 				}
 				return result;
 			}
@@ -256,11 +257,11 @@
 				
 			$("img[name='zoneOff']").click(function(event) {
 				var parentForm = $(this).parent().parent();
-				var z = parentForm.find("select[name='zoneNumber']").val();
+				var z = parentForm.find("input[name='eventIdx']").val();
 				$.ajax({
 					url: "setzone.do",
 					type: "get",
-					data: { zoneNum: z, zoneState: 0 },
+					data: { eventIdx: z, zoneState: 0 },
 					timeout: 2000,
 					success: function(){
 						getStatus();
@@ -273,15 +274,15 @@
 			
 			$("img[name='zoneOn']").click(function(event) {
 				var parentForm = $(this).parent().parent();
-				var z = parentForm.find("select[name='zoneNumber']").val();
+				var z = parentForm.find("input[name='eventIdx']").val();
 				$.ajax({
 					url: "setzone.do",
 					type: "get",
-					data: { zoneNum: z, zoneState: 1 },
+					data: { eventIdx: z, zoneState: 1 },
 					timeout: 2000,
 					success: function(){
 						var dt = new Date();
-						parentForm.find(".lastStart").text(dt.getUTCMonth() + "/" + dt.getUTCDate() + " " + dt.getUTCHours() + ":" + dt.getUTCMinutes());
+						parentForm.find(".lastStart").text((dt.getMonth()+1) + "/" + dt.getDate() + " " + dt.getHours() + ":" + dt.getMinutes());
 						getStatus();
 					},
 					error:function(){
@@ -350,7 +351,7 @@
 			if (checkRegexp( sDate, /^[0-1][0-9]\/[0-3][0-9]\/[0-9][0-9]$/, "Date must be in format mm/dd/yy", sDate.parent() )) {
 				$("#date").text(sDate.val());
 				unloadPopupBox('#datePopup');
-				sTime.removeClass( "ui-state-error" );
+				sDate.removeClass( "ui-state-error" );
 				tDate = $("#date").text();
 				tTime = $("#time").text();
 				$.ajax({
@@ -447,6 +448,7 @@
 	function getStatus() {
 		$.getJSON("/getsts.do").done(function( json ) {
 			$("#status").html(json.status);
+			$("#date").html(json.date);
 			$("#time").html(json.time.substring(0,5));
 			if (json.status == "Running") {
 				$("#pgmStart").css({ opacity: 0.4 }).prop('disabled', true);

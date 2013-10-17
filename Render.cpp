@@ -86,7 +86,7 @@ extern int	errHttpRequest;
 
 extern char *	pgmStatus;
 
-extern ZONE_INFO zones[MAX_EVENTS] ;
+extern ZONE_INFO events[MAX_EVENTS] ;
 
 /* ------------------------------------------------------------ */
 /*				Local Variables									*/
@@ -421,7 +421,7 @@ void RenderEventListPage() {
 		sprintf(
 			stsBuf, 
 			"\t{\"eventIdx\": %d, \"eventName\": \"%s\", \"zoneNumber\": %d, \"eventActive\": \"%c\", \"eventTime\": \"%02d:%02d\", \"eventRuntime\": %d, \"eventRunOn\": \"%s\", \"lastStart\": \"%d\"}",
-			i, zones[i].name, zones[i].zone, zones[i].active, zones[i].hour, zones[i].minute, zones[i].runTime, zones[i].runOnDay, zones[i].lastStart);
+			i, events[i].name, events[i].zone, events[i].active, events[i].hour, events[i].minute, events[i].runTime, events[i].runOnDay, events[i].lastStart);
 		tcpClient.println(stsBuf);
 	}
 	tcpClient.println("]}");

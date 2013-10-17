@@ -21,15 +21,34 @@ Digilent. Keith has put together a somewhat more robust version of the HTTP serv
 I just haven't had time to go back an re-implement on that foundation. 
 
 One of two varieties of Real Time Clock can be used (see App.h settings, below). You can either use RTC that is embedded in the
-chipKIT PIC32's, or a DS1302-based daughter board connected via SCLK, IO, and CE pins.
+chipKIT PIC32's, or a DS1302-based daughter board connected via SCLK, IO, and CE pins. FYI: I used a very inexpensive DS1302 board
+from China (originall obtained here: http://www.dx.com/p/150179). It was necessary to add a pullup resistor to the I/O line 
+for it to work correctly. See my blog here: ?????
 
 You are free to use this project under the GNU LGPL license.
 
 
 Requirements:
 -------------
+	Hardware
+	--------
 
-	** TODO **
+	Digilent chipKIT uC32		- PIC32 Arduino-compatible microcontroller board made by Digilent
+	Digilent chipKIT WiFi shield	- WiFi shield with on-board SD card
+	Micro-SD card			- A micro-SD card to hold the web page components - probably the smallest available is more 
+					  than enough
+	Either:
+	 a DS1302 daughter board 
+	 or a 32.768Khz crystal		- The controller currently requires that you connect either a DS1302-based Real Time Clock 
+					  daughter board or that you enable the uC32's on-board RTC by soldering on a 32.768Khz crystal
+					  (see my blog for details: ????? ).
+
+	Some sort of board for controlling your sprinkler relays. In my blog entry, I describe how I used a second-hand triac 
+	controller board which I drive directly from the uC32 IO pins (26 trhough 31, and 32).
+
+
+	Software
+	--------
 
 	MPIDE 0715 or newer  	** This is important, as there were some WiFi and SD fixes since the prior official release, I believe.
 	
@@ -38,26 +57,49 @@ Requirements:
 Installation:
 -------------
 
+Obtain the controller code and supporting webpage files from the code repository currently here: https://code.google.com/p/wifi-sprinkler
+
+Copy the html components from the webpages directory to the root of the SD card.
+Use Digilent's MPIDE to load the sketch, HttpServer.pde and related libraries. Edit configuration settings as described
+in Configuration section below. Compile and upload to uC32.\
 
 	
 Configuration:
 --------------
 	
-	** TODO - finish **
+	HttpServer.pde:
+		#define USE_OPEN_SECURITY   	0       // Only has meaning if doing WiFi, 0 -> WPA2, 1 -> Open
+
+
+							
+
+		// Set to 1 if using DHCP, 0 if using a static IP
+		
+#define USE_DHCP    0			// 0 -> Static IP, 1 -> DHCP
+
+		ipServer = { 192,168,1,100 };		// If using static IP, specify IP address and port
+		ptServer = 80;
+
+		char * szSSID       = "yournetwork";	// the name of the network to connect to
+		
+char * szPassPhrase	= "passphrase";	// pass phrase to use with WPA2
+: has no meaning if using open security
+
+
 
 	In App.h, define these values:
-		#define MAX_ZONES			6		// Number of spinkler zones (solenoid valves) in your yard
+		#define MAX_ZONES		6		// Number of spinkler zones (solenoid valves) in your yard
 
-		#define MAX_EVENTS			15		// Number of events to support - must have corresponding initializations lines
-											// for zones array in App.cpp
+		#define MAX_EVENTS		15		// Number of events to support - must have corresponding 
+								// initializations lines for zones array in App.cpp
 											
-		#define FIRST_VALVE_PIN		26		// Defines the I/O pin of the first sprinkler valve solenoid - this pin, followed
-											// by the next 5 will control your sprinkler valves
+		#define FIRST_VALVE_PIN		26		// Defines the I/O pin of the first sprinkler valve solenoid - this pin,
+								// followed by the next 5 will control your sprinkler valves
 											
 		#define MASTER_VALVE_PIN	32		// If you have a master/backflow valve, this pin  will be used to control it.
 
-		#define INVERT_PINS 		'Y' 	// If you want Arduino pin to be HIGH for Off, set to 'Y', normally set to 'N'
-											// (my triac board uses reverse levels)
+		#define INVERT_PINS 		'Y'		// If you want Arduino pin to be HIGH for Off, set to 'Y', normally set to 'N'
+								// (my triac board uses reverse levels)
 		#define INVERT_MASTER_PIN	'Y'		// Like INVERT_PINS, but for the master valve
 
 		// To specify which Real Time Clock you will use, specify one of either:
@@ -72,15 +114,31 @@ Configuration:
 		#define CE          41
 
 
+	Open http://{your IP address}  (default, 192.168.1.100)
+	
+
+
 Stuff left to do:
 -----------------
-Report last run time	     -	Show the last date/time each event ran
+Sync Time with time server   -	Periodically sync RTC with time server..or at least browser time..RTC's seem to drift
+				a lot.
+Remove custom DS1302 lib     -  Originally, the DS1302 did not seem to work with all the libraries I tried. I wound
+				up creating a custom one that seemed to work better, but I also added a pullup 
+				resistor to the I/O line. It's possible that was the problem all along - need tl
+				try oneof the existing libraries out there.
 Configurable WiFi settings   -	Make the WiFi SSID and password configurable via USB.
 Configurable # of events     -	Make the number of events available a user-configurable setting.
 Start/End time validation    -	Check that none of the start time/run times overlap.
 
 ChipKIT WF32		     -	Try on Digilents recently release (as of this writing) WF32 board, which incorporates
 				the three components in this solution - WiFi and SD - in one board (still need an RTC).
+
+Migrate to new Digilent      -  Subsequent to starting this project using an early version of Http server project they
+				had provided to the community, I had a dialog with a couple of theengineers at Digilent
+				about a couple of issues. They have subsequently provided a cleaner and more robust
+				example implementation. This app should really be migrated to that newer starting 
+				platform, as it addresses several potential issues in the original implementation,
+				including support for multiple concurrent requests. 
 
 Add weather intelligence     -	Add some weather awareness whereby the server process checks a weather API such
 				as that provided by NOAA and adjusts the watering schedule accordingly.
@@ -106,7 +164,7 @@ Thanks to Gene Apperson and Keith Vogel from Digilent for their contributions of
 general for providing great microcontroller platforms at an accessible price.
 
 Thanks to Dennis Clark at Servo Magazine for their article describing how to use Gene's original HttpServer 
-implementation. They also host a zimp file of the HttpServer project in their downloads section (http://www.servomagazine.com/index.php/magazine/article/november2012_MrRoboto)
+implementation. They also host a zip file of the HttpServer project in their downloads section (http://www.servomagazine.com/index.php/magazine/article/november2012_MrRoboto)
 
 This project uses the Jquery, JQueryUI and JsRender templating librarys to render the console page. They are included under the MIT License:
 	http://jquery.com/
