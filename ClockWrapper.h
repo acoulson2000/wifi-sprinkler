@@ -58,5 +58,6 @@ void 	ClockGetDOWStr(char * buffer, WrappedTime time, uint8_t format);
 void 	ClockGetMonthStr(char * buffer, WrappedTime time, uint8_t format);
 int 	DayOfWeek(int d, int m, int y);
 long	now();
+long	timeAsEpoch(WrappedTime tm);
 
 #endif

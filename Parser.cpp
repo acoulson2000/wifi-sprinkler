@@ -660,10 +660,8 @@ void ParseSetZone() {
 		} else if (stricmp(szParamName, "zoneState") == 0) {
 //Serial.print("setzone: "); Serial.print(eventIdx); Serial.println(atoi(szParamValue), DEC);
 			if (atoi(szParamValue) == 0) {
-				events[eventIdx].currentState = 0;
 				manualOff(events[eventIdx].zone);
 			} else if (atoi(szParamValue) == 1)  {
-				events[eventIdx].currentState = 1;
 				events[eventIdx].lastStart = now();
 				manualOn(events[eventIdx].zone);
 			}

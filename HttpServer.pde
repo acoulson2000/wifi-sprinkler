@@ -214,13 +214,15 @@ const uint32_t	msWaitLimit    = 5000;
 const uint32_t	msListenLimit = 30000;
 const uint32_t	msClientTimeout = 1000;
 
-/* The Uno32 must use either a WiFiShield or PmodShield
-** to support any network hardware. Since the SPI2 SCK
-** conficts with LED1 on the Uno32, use the LED on
-** the WiFiShield or PmodShield instead.  
-*/
+/* Use LEDs on the WiFiShield or PmodShield or uC32 or LD3 and LD4 
+   on the WF32 for network status indicators */
+#if defined(_BOARD_UNO32_) || defined(_BOARD_UNO_) || defined(_BOARD_UC32_) || defined(_BOARD_WF32_64_)
 const int    pinLedConnect = 3;
 const int    pinLedInitialized = 5;
+#elif defined (_BOARD_WF32_)
+const int    pinLedConnect = 47;
+const int    pinLedInitialized = 48;
+#endif	
 
 #define	pinSdCs	PIN_SDCS
 
@@ -287,8 +289,8 @@ extern uint8_t	rgbFileBuf[];
 #if defined(USING_WIFI)
 
 //***DLC
-char * szSSID       = "yourssid";			// the name of the network to connect to
-char * szPassPhrase	= "yourpassphrase";			// pass phrase to use with WPA2
+char * szSSID       = "coulson2b";			// the name of the network to connect to
+char * szPassPhrase	= "0717640717";			// pass phrase to use with WPA2
 											//   has no meaning if using open security
 int	conID			= DWIFIcK::INVALID_CONNECTION_ID; 
      
@@ -1010,7 +1012,6 @@ HttpTask()
 				/* A blank line indicates the end of the header lines and the
 				** beginning of the message body.
 				*/
-				Serial.println();
 				sthCur = sthBeginResponse;
 			}
 			fInputReady = false;		//indicate the line has been processed

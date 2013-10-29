@@ -38,15 +38,20 @@ Requirements:
                                   it is persisted between reboots. The smallest you have will probably be plenty - the file
                                   sizes total less than 1MB total.
     
+	Either:
     Digilent chipKIT uC32        - PIC32 Arduino-compatible microcontroller board made by Digilent
     Digilent chipKIT WiFi shield - WiFi shield with on-board SD card
     Micro-SD card                - A micro-SD card to hold the web page components - probably the smallest available is more 
                                    than enough
+	or:
+	Digilent chipKIT WF32        - A newer board that combines the functionality of the uC32 and WiFi shield into one board.
+	
     Either:
      a DS1302 daughter board 
-     or a 32.768Khz crystal      - The controller currently requires that you connect either a DS1302-based Real Time Clock 
+    or:
+	 a 32.768Khz crystal      - The controller currently requires that you connect either a DS1302-based Real Time Clock 
                                    daughter board or that you enable the uC32's on-board RTC by soldering on a 32.768Khz crystal
-                                  (see my blog for details: ????? ).
+                                  (see my blog for details: http://wp.me/p14XJj-6d).
 
     Some sort of board for controlling your sprinkler relays. In my blog entry, I describe how I used a second-hand triac 
     controller board which I drive directly from the uC32 IO pins (26 trhough 31, and 32).
@@ -56,6 +61,10 @@ Requirements:
     --------
 
     MPIDE 0715 or newer      ** This is important, as there were some WiFi and SD fixes since the prior official release, I believe.
+	**NOTE**                 ** To use the WF32 instead of uC32 + WiFi shield, I had to obtain an even newer build of the supporting
+                                libraries. Specifically, the pin numbers for the SPI support for the SD card drivers are different
+								and require more recent library files. I obtained the latest updates from the source repository
+								here: https://github.com/chipKIT32/chipkit-core
     
 
     
@@ -145,7 +154,7 @@ Configuration:
 
 Stuff left to do:
 -----------------
-Sync Time with time server   -    Periodically sync RTC with time server..or at least browser time..RTC's seem to drift a lot.
+Sync Time with time server   -  Periodically sync RTC with time server..or at least browser time..RTC's seem to drift a lot.
 
 Add basic HTML authentication? (optional) - Currently the assumption is that your WiFi is secure.
 
@@ -167,9 +176,6 @@ WiFi configuration           -  It would be REALLY nice to have the code start o
                                 join for 'normal' operation. Once configured, the system would restart and join the localnetwork.
                                 Of course, some 'back door' would have to be provided in case there is a connection issue. Also,
                                 providing access to the config settings from the main page would be desirable.
-
-ChipKIT WF32                 -  Try on Digilents recently release (as of this writing) WF32 board, which incorporates
-                                the three components in this solution - WiFi and SD - in one board (still need an RTC).
 
 Migrate to new Digilent code  - Subsequent to starting this project using an early version of Http server project they
                                 had provided to the community, I had a dialog with a couple of the engineers at Digilent

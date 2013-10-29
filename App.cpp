@@ -61,12 +61,8 @@
 const uint32_t	msHeartbeat = 1000;
 const uint32_t	msHeartbeatDuration = 200;
 
-/* The Uno32 must use either a WiFiShield or PmodShield
-** to support any network hardware. Since the SPI2 SCK
-** conficts with LED1 on the Uno32, use the LED on
-** the WiFiShield or PmodShield instead.  
-*/
-const int    pinLedStatus = 6;
+// Use PIN_LED2 (pin 12 on uC32 and WF32) for heartbeat
+const int    pinLedStatus = PIN_LED2;
 
 #define	pinSdCs	PIN_SDCS
 
@@ -330,7 +326,7 @@ void AppInit() {
 
 void setupSprinklerPins() {
 	// configure sprinkler control pins:
-	for (int i = FIRST_VALVE_PIN; i < FIRST_VALVE_PIN+6; i++) {
+	for (int i = FIRST_VALVE_PIN; i < FIRST_VALVE_PIN+MAX_ZONES; i++) {
 		pinMode(i, OUTPUT);
 		delay(50);
 		if (i == MASTER_VALVE_PIN) {
@@ -397,16 +393,20 @@ void AppTask() {
         }
     }
 	
-	// has .1 seconds passed?
+	// has at least .5 second passed?
 	nowMillis = millis();
-	if ((nowMillis - lasttime) > 100) {
-		// set the Arduino Time library's time so now() it is accurate
+	if ((nowMillis - lasttime) > 500) {
 		WrappedTime realtime = ClockGetTime();
 
 		// Get current time as a string
 		ClockGetShortTimeString(nowString, realtime);
-
-		if (strcmp(pgmStatus, szPgmStsRunning) == 0 && strcmp(lasttimestr, nowString) != 0) {
+		
+		// Check whether a zone should turn on.
+		// To limit interference with manual actions, zones only turn on or off
+		// in first couple seconds of each minute.
+		if ( (realtime.second >= 0 && realtime.second <= 1)
+			&& strcmp(pgmStatus, szPgmStsRunning) == 0 
+			&& strcmp(lasttimestr, nowString) != 0) {
 			//ClockPrintTime();
 			checkForZoneAction(realtime);
 		}
@@ -469,112 +469,99 @@ void ReadSerialBytes(char * buf, int bytes) {
 void checkForZoneAction(WrappedTime realtime) {
 	for (int i = 0; i < MAX_EVENTS; i++) {
 		// Check for zones to turn on
-		// First, if the event's zone was manually forced off while running, and 'duration'
-		
-		// OK, now if it is not already on, is it active and does it run on this day?
-		if (events[i].active == 'Y' 
-			&& events[i].currentState != 1
-			&& 
-			( (events[i].runOnDay[0] == 'Y' && realtime.week == SUNDAY)
-			|| (events[i].runOnDay[1] == 'Y' && realtime.week == MONDAY)
-			|| (events[i].runOnDay[2] == 'Y' && realtime.week == TUESDAY)
-			|| (events[i].runOnDay[3] == 'Y' && realtime.week == WEDNESDAY)
-			|| (events[i].runOnDay[4] == 'Y' && realtime.week == THURSDAY)
-			|| (events[i].runOnDay[5] == 'Y' && realtime.week == FRIDAY)
-			|| (events[i].runOnDay[6] == 'Y' && realtime.week == SATURDAY)
-			)
-		) { 
-		
-			// OK, is it time?
-			if ( events[i].hour == realtime.hour && events[i].minute == realtime.minute ) {
-				// Need to prevent a zone turning right back on if it was turned off manually
-				// at the beginning of an event cycle.
-				// If it WAS forced off, but NOT during the run duration of the event,
-				// turn it ON.
-				if (  forcedOff[events[i].zone] && (now() > (events[i].lastStart + ((events[i].runTime) * 60))) ) {
-					turnOn(events[i].zone);
-					events[i].currentState = 1;
-					events[i].lastStart = now();
-					forcedOn[events[i].zone] = false;			// make sure forcedOn flag is off, otherwise runtime isn't respected
-					forcedOff[events[i].zone] = false;
-				}
+
+		if (events[i].active == 'Y') {
+			// OK, is it active and does it run on this day?
+			if (events[i].currentState != 1
+				&& 
+				( (events[i].runOnDay[0] == 'Y' && realtime.week == SUNDAY)
+				|| (events[i].runOnDay[1] == 'Y' && realtime.week == MONDAY)
+				|| (events[i].runOnDay[2] == 'Y' && realtime.week == TUESDAY)
+				|| (events[i].runOnDay[3] == 'Y' && realtime.week == WEDNESDAY)
+				|| (events[i].runOnDay[4] == 'Y' && realtime.week == THURSDAY)
+				|| (events[i].runOnDay[5] == 'Y' && realtime.week == FRIDAY)
+				|| (events[i].runOnDay[6] == 'Y' && realtime.week == SATURDAY) )
+			) { 
+				// OK, is it time?
+				if ( events[i].hour == realtime.hour && events[i].minute == realtime.minute ) {
+						turnOn(events[i].zone);
+						events[i].currentState = 1;
+						events[i].lastStart = now();
+				} //end check for on
 			}
-		} //end check for on
-		
+//Serial.print(">>>currentState=");Serial.print(currentState,DEC);Serial.print(" now()=");Serial.print(now(),DEC);Serial.print(" test=");Serial.println((events[i].lastStart + (events[i].runTime * 60) ),DEC);
+		}
 		// Any to turn off?
-		if (events[i].active == 'Y' && events[i].currentState == 1) {
+		if (events[i].currentState == 1) {
 			// On long enough?
-			if ( !forcedOn[events[i].zone] && (now() > (events[i].lastStart + ((events[i].runTime) * 60))) ) {
+			if ( now() > (events[i].lastStart + (events[i].runTime * 60) ) ){
 				// TURN IT OFF!
 				turnOff(events[i].zone);
 				events[i].currentState = 0;
-				forcedOn[events[i].zone] = false;	// reset forced flags just to be safe
-				forcedOff[events[i].zone] = false;
 			}
 		}
 		
 		// NO zone should be on over 99 minutes
-		if (events[i].currentState == 1) {
+		if (events[i].currentState == 1 || forcedOn[events[i].zone] ) {
 			// On long enough?
 			if (now() > (events[i].lastStart + (99 * 60))) {
 				// TURN IT OFF!
 				turnOff(events[i].zone);
 				events[i].currentState = 0;
 				forcedOn[events[i].zone] = false;
-				forcedOff[events[i].zone] = false;
 			}
 		}
 	}
 }
 
 void turnOff(int zone) {
+	Serial.print(zone, DEC);Serial.print("** OFF :");
 #if defined(USE_MASTER_VALVE)
 	if (INVERT_MASTER_PIN == 'Y') {
 		digitalWrite(MASTER_VALVE_PIN, HIGH);
-		Serial.print(MASTER_VALVE_PIN);Serial.println(" ON!");				
+		Serial.print("pin ");Serial.print(MASTER_VALVE_PIN);Serial.print(" HIGH, ");				
 	} else {
 		digitalWrite(MASTER_VALVE_PIN, LOW);
-		Serial.print(MASTER_VALVE_PIN);Serial.println(" OFF!");				
+		Serial.print("pin ");Serial.print(MASTER_VALVE_PIN);Serial.print(" LOW, ");				
 	}
 #endif
 				 
 	if (INVERT_PINS == 'Y') {
 		digitalWrite((zone + FIRST_VALVE_PIN - 1), HIGH);
-		Serial.print(zone, DEC);Serial.print(" ON! pin ");Serial.println((zone + FIRST_VALVE_PIN - 1), DEC);				
+		Serial.print("pin ");Serial.print(zone, DEC);Serial.println(" HIGH");				
 	} else {
 		digitalWrite((zone + FIRST_VALVE_PIN - 1), LOW);
-		Serial.print(zone, DEC);Serial.print(" OFF! pin ");Serial.println((zone + FIRST_VALVE_PIN - 1), DEC);				
+		Serial.print("pin ");Serial.print(zone, DEC);Serial.println(" LOW");				
 	}
 }
 
 void turnOn(int zone) {
+	Serial.print(zone, DEC);Serial.print("** ON :");
 #if defined(USE_MASTER_VALVE)
 	if (INVERT_MASTER_PIN == 'Y') {
 		digitalWrite(MASTER_VALVE_PIN, LOW);
-		Serial.print(MASTER_VALVE_PIN);Serial.println(" OFF!");				
+		Serial.print("pin ");Serial.print(MASTER_VALVE_PIN);Serial.print(" LOW, ");				
 	} else {
 		digitalWrite(MASTER_VALVE_PIN, HIGH);
-		Serial.print(MASTER_VALVE_PIN);Serial.println(" ON!");				
+		Serial.print("pin ");Serial.print(MASTER_VALVE_PIN);Serial.print(" HIGH, ");				
 	}
 #endif
 
 	if (INVERT_PINS == 'Y') {
 		digitalWrite((zone + FIRST_VALVE_PIN - 1), LOW);
-		Serial.print(zone, DEC);Serial.print(" OFF! pin ");Serial.println((zone + FIRST_VALVE_PIN - 1), DEC);				
+		Serial.print("pin ");Serial.print(zone, DEC);Serial.println(" LOW");				
 	} else {
 		digitalWrite((zone + FIRST_VALVE_PIN - 1), HIGH);
-		Serial.print(zone, DEC);Serial.print(" ON! pin ");Serial.println((zone + FIRST_VALVE_PIN - 1), DEC);				
+		Serial.print("pin ");Serial.print(zone, DEC);Serial.println(" HIGH");				
 	}
 }
 
 void manualOff(int zone) {
-	forcedOff[zone] = true;
 	forcedOn[zone] = false;
 	turnOff(zone);
 }
 
 void manualOn(int zone) {
-	forcedOff[zone] = false;
 	forcedOn[zone] = true;
 	turnOn(zone);
 }

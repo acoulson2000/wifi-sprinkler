@@ -312,6 +312,10 @@ int DayOfWeek(int d, int m, int y) {
  
 long now() {
 	WrappedTime tm = ClockGetTime();
+	return timeAsEpoch(tm);
+}
+
+long timeAsEpoch(WrappedTime tm) {
 	int i;
 	long seconds = SECS_YR_2000;
 

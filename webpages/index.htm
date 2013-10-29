@@ -26,7 +26,7 @@
 	
 		<div class="main">
 			<div class="banner">
-				<div class="heading">WiH2O <img src="spinner1.gif" id="loading" style="display:none"/></div>
+				<div class="heading">W&#299;H2O <img src="spinner1.gif" id="loading" style="display:none"/></div>
 				<div class="timestamp">
 					<div id="date">mm/dd/yy</div>
 					<div id="time">hh:mm</div>
@@ -49,18 +49,14 @@
 				</div>
 			</div>
 			<div class="schedule">
-				<div style="">Status: <span id="status">pending...<span/></div>
+				<div style="height:20px; vertical-align: top;">Status: <span id="status">pending...<span/></div>
 				<div>
 					&nbsp;&nbsp;
 					<img src="start24.png" alt="Run Program" id="pgmStart"/>
 					&nbsp;&nbsp;&nbsp;
 					<img src="pause24.png" alt="Stop Program" id="pgmStop"/>
 				</div>
-				<div style="height:20px">
-					<div id="validateTips" class="ui-state-highlight" style="display:none; width:auto;">&nbsp;</div>
-				</div>
 				
-				<div id="startValidateTips" class="ui-state-highlight" style="display:none;">&nbsp;</div>
 				<table border="0" cellpadding="1" cellspacing="1">
 					<thead>
 						<tr>
@@ -286,7 +282,7 @@
 						getStatus();
 					},
 					error:function(){
-						alert("Failed to contact WiH20 controller");
+						alert("Failed to contact W&#299;H20 controller");
 					}   
 				}); 
 			});
@@ -327,7 +323,7 @@
 					dataType: "text",
 					success: function(data){},
 					error:function(){
-						alert("Failed to contact WiH20 controller");
+						alert("Failed to contact W&#299;H20 controller");
 					}   
 				}); 
 			} else
@@ -361,7 +357,7 @@
 					dataType: "text",
 					success: function(data){},
 					error:function(){
-						alert("Failed to contact WiH20 controller");
+						alert("Failed to contact W&#299;H20 controller");
 					}   
 				}); 
 			} else
@@ -403,7 +399,7 @@
 					getStatus();
 				},
 				error:function(){
-					alert("Failed to contact WiH20 controller");
+					alert("Failed to contact W&#299;H20 controller");
 				}   
 			}); 
 		}
@@ -420,7 +416,7 @@
 					getStatus();
 				},
 				error:function(){
-					alert("Failed to contact WiH20 controller");
+					alert("Failed to contact W&#299;H20 controller");
 				}   
 			}); 
 		}
@@ -464,7 +460,7 @@
 		.fail(function( jqxhr, textStatus, error ) {
 			var err = textStatus + ', ' + error;
 			console.log( "Request Failed: " + err);
-			$("#status").html("WiH20 not Responding");
+			$("#status").html("W&#299;H20 not Responding");
 			$("#pgmStart").css({ opacity: 0.4 });
 			$("#pgmStop").css({ opacity: 0.4 });
 		});
