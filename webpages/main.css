@@ -17,8 +17,12 @@ td {
 .main {
 	width: 850px;
 	background: white;
+	border-radius: 4px;
 	box-shadow: rgba(0, 0, 0, 0.5) 5px 5px 5px 5px;
+	opacity:.85;
+	filter:alpha(opacity=85);
 }
+
 .banner {
 	width: 850px;
 	display:inline-block;
