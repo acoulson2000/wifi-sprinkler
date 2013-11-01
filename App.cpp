@@ -326,20 +326,23 @@ void AppInit() {
 
 void setupSprinklerPins() {
 	// configure sprinkler control pins:
+#if defined(USE_MASTER_VALVE)
+	pinMode(MASTER_VALVE_PIN, OUTPUT);
+	delay(50);
+	if (INVERT_MASTER_PIN == 'Y') {
+		digitalWrite(MASTER_VALVE_PIN, HIGH);
+	} else {
+		digitalWrite(MASTER_VALVE_PIN, LOW);
+	}
+#endif
+
 	for (int i = FIRST_VALVE_PIN; i < FIRST_VALVE_PIN+MAX_ZONES; i++) {
 		pinMode(i, OUTPUT);
 		delay(50);
-		if (i == MASTER_VALVE_PIN) {
-			if (INVERT_MASTER_PIN == 'Y')
-				digitalWrite(i, HIGH);
-			else
-				digitalWrite(i, LOW);
-		} else {
-			if (INVERT_PINS == 'Y')
-				digitalWrite(i, HIGH);
-			else
-				digitalWrite(i, LOW);
-		}
+		if (INVERT_PINS == 'Y')
+			digitalWrite(i, HIGH);
+		else
+			digitalWrite(i, LOW);
 	}
 }
 	
@@ -528,10 +531,10 @@ void turnOff(int zone) {
 				 
 	if (INVERT_PINS == 'Y') {
 		digitalWrite((zone + FIRST_VALVE_PIN - 1), HIGH);
-		Serial.print("pin ");Serial.print(zone, DEC);Serial.println(" HIGH");				
+		Serial.print("pin ");Serial.print((zone + FIRST_VALVE_PIN - 1), DEC);Serial.println(" HIGH");				
 	} else {
 		digitalWrite((zone + FIRST_VALVE_PIN - 1), LOW);
-		Serial.print("pin ");Serial.print(zone, DEC);Serial.println(" LOW");				
+		Serial.print("pin ");Serial.print((zone + FIRST_VALVE_PIN - 1), DEC);Serial.println(" LOW");				
 	}
 }
 
@@ -549,10 +552,10 @@ void turnOn(int zone) {
 
 	if (INVERT_PINS == 'Y') {
 		digitalWrite((zone + FIRST_VALVE_PIN - 1), LOW);
-		Serial.print("pin ");Serial.print(zone, DEC);Serial.println(" LOW");				
+		Serial.print("pin ");Serial.print((zone + FIRST_VALVE_PIN - 1), DEC);Serial.println(" LOW");				
 	} else {
 		digitalWrite((zone + FIRST_VALVE_PIN - 1), HIGH);
-		Serial.print("pin ");Serial.print(zone, DEC);Serial.println(" HIGH");				
+		Serial.print("pin ");Serial.print((zone + FIRST_VALVE_PIN - 1), DEC);Serial.println(" HIGH");				
 	}
 }
 

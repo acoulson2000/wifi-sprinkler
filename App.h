@@ -38,7 +38,7 @@
 #define FIRST_VALVE_PIN		26		// Defines the I/O pin of the first sprinkler valve solenoid - this pin, followed
 									// by the next 5 will control your sprinkler valves
 									
-#define USE_MASTER_VALVE			// Comment out if you don't have a master valve. If you do, USER_MASTER_VALVE should
+#define USE_MASTER_VALVE	true	// Comment out if you don't have a master valve. If you do, USER_MASTER_VALVE should
 									// be defined, along with MASTER_VALVE_PIN, which will be turned on when any zone is turned on.
 #define MASTER_VALVE_PIN	32		// If you have a master/backflow valve, this pin  will be used to control it.
 

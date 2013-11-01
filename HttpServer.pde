@@ -133,7 +133,7 @@
 ** to the server.
 */
 #if (USE_DHCP == 0)
-IPv4        ipServer = { 192,168,2,91 };
+IPv4        ipServer = { 192,168,2,111 };
 #endif // End No DHCP
 
 /* Define the port on which the server will listen for inbound
@@ -289,8 +289,8 @@ extern uint8_t	rgbFileBuf[];
 #if defined(USING_WIFI)
 
 //***DLC
-char * szSSID       = "coulson2b";			// the name of the network to connect to
-char * szPassPhrase	= "0717640717";			// pass phrase to use with WPA2
+char * szSSID       = "yourssid";			// the name of the network to connect to
+char * szPassPhrase	= "yourkey";			// pass phrase to use with WPA2
 											//   has no meaning if using open security
 int	conID			= DWIFIcK::INVALID_CONNECTION_ID; 
      

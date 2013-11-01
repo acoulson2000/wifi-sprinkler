@@ -12,7 +12,7 @@
 -->
 <html>
 	<head>
-		<title></title>
+		<title>W&#299;H2O</title>
 		<link rel="stylesheet" type="text/css" href="main.css">
 		<link rel="stylesheet" type="text/css" href="jqui.css">
 		<link rel="stylesheet" type="text/css" href="jquithem.css">
@@ -86,9 +86,9 @@
 							<td>
 								<select name="zoneNumber" size="1"><option selected="selected" value="">off</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></td>
 							<td>
-								<input maxlength="5" name="zoneStart" size="4" type="text" value="12:00" /></td>
+								<input maxlength="5" name="zoneStart" size="5" type="text" value="12:00" /></td>
 							<td>
-								<input maxlength="2" name="zoneRuntime" size="1.5" type="text" value="0" /></td>
+								<input maxlength="2" name="zoneRuntime" size="2" type="text" value="0" /></td>
 							<td>
 								<input name="zoneSunday" type="checkbox" value="1" /></td>
 							<td>
@@ -134,10 +134,10 @@
 				</select>
 			</td>
 			<td>
-				<input maxlength="5" name="eventStart" size="4" type="text" value="{{>eventTime}}" id="zoneTime_{{>eventIdx}}"/>
+				<input maxlength="5" name="eventStart" size="5" type="text" value="{{>eventTime}}" id="zoneTime_{{>eventIdx}}"/>
 			</td>
 			<td>
-				<input maxlength="2" name="eventRuntime" size="1.5" type="text" value="{{>eventRuntime}}" /></td>
+				<input maxlength="2" name="eventRuntime" size="2" type="text" value="{{>eventRuntime}}" /></td>
 			<td>
 				<input name="eventSun" type="checkbox" {{checker:eventRunOn day='Sunday'}} value="Y" /></td>
 			<td>
