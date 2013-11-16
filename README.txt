@@ -4,11 +4,14 @@ Introduction:
 -------------
 This project is a result of my personal effort to create a WiFi-enabled lawn sprinkler controller for my home.
 
-Currently, the chipKIT µc32 with a chipKIT WiFi shield are required, along with an SD card plugged into the slot on the WiFi
-shield, which holds the web pages and the persisted schedule (in order to survive power outages).
+Currently, one of two configurations are available:
+1) The chipKIT µc32 with a chipKIT WiFi shield
+2) The chipKIT WF32, which includes the WiFi and SD slot on-board.
+In either case, an SD card plugged into the slot on the WiFi shield is required.It holds the web pages and the persisted 
+schedule (in order to survive power outages).
 
-The chipKIT µc32 is an Arduino-compatible microcontroller board based on the PIC32 processor made by Digilent. I went with the µc32
-because I needed more RAM to hold the schedules. 
+The chipKIT µc32 (and now the WF32) is an Arduino-compatible microcontroller board based on the PIC32 processor made by Digilent. 
+I went with the µc32 because I needed more RAM to hold the schedules. 
 The chipKIT µc32 is also quite a bit faster, which is probably a good thing - even with the faster speed, serving up the
 web pages is not exactly lightning fast. I suspect a MAX32 would also do the job - and would provide an opportunity to persist
 the schedule in EPROM instead of on the SD card. Other WiFi shields might also be compatible.
