@@ -63,6 +63,7 @@
 /* ------------------------------------------------------------ */
 
 int		errParse;
+int		errHttpRequest;
 int		idresRequest;
 int		rtypResource;			//data type of resource
 int		cbResource;				//data length of resource
@@ -71,6 +72,9 @@ extern uint8_t	rgpinLed[];
 extern uint8_t	rgvalLedState[];
 
 extern bool	fSDfs;
+extern File	fhData;
+extern int requireAuth;
+extern char encodedCreds[];
 extern File	fhData;
 
 extern ZONE_INFO events[MAX_EVENTS] ;
@@ -102,6 +106,7 @@ void ParseSetPgmStatus();
 void ParseSetTime();
 void ParseSaveEvt();
 void ParseSetZone();
+void ParseAuthToken();
 void ParseFormParameter(char * szName, char * szValue);
 void ParseToken(char * szOutput, char chDelim);
 char PeekChar();
@@ -154,7 +159,13 @@ void ParseHttpRequest() {
 	char	szMethod[16];
 	char	szVersion[16];
 
-	errParse = errOK;
+	// Default to not authorized if authorization is required.
+	// If we later get a valid Authorization token, errParse will be set to errOK.
+	if (requireAuth == 1) {
+		errParse = errNotAuthorized;
+	} else {
+		errParse = errOK;
+	}
 	idresRequest = idresNil;
 	rtypResource = rtypNil;
 	cbResource = 0;
@@ -244,7 +255,7 @@ void ParseGetRequest() {
 	else if (stricmp(szResourcePath, szResStatusPage) == 0) {
 		/* Request for the status */
 		idresRequest = idresStatusPage;
-		rtypResource = rtypText;
+		rtypResource = rtypJson;
 	}
 	else if (stricmp(szResourcePath, szResSetStatus) == 0) {
 		/* Request for RESTful service to set program status on/off		*/		
@@ -277,7 +288,7 @@ void ParseGetRequest() {
 	else if (stricmp(szResourcePath, szResGetEvents) == 0) {
 		/* Request for event list		*/		
 		idresRequest = idresEventList;
-		rtypResource = rtypText;
+		rtypResource = rtypJson;
 	}
 	else {
 		/* The requested resource isn't one of the hard coded URLs. The
@@ -312,10 +323,7 @@ void ParseGetRequest() {
 **		This function is a placeholder for parsing the HTTP HEAD
 **		method.
 */
-
-void
-ParseHeadRequest()
-	{
+void ParseHeadRequest() {
 
 	errParse = errNotImplemented;
 
@@ -448,9 +456,10 @@ void ParseDeleteRequest() {
 **
 **	Description:
 **		This function parses an HTTP Request header line and sets
-**		the global state as appropriate. We don't support any headers,
-**		so this function does nothing. It is a place holder where
-**		header parsing logic could be added.
+**		the global state as appropriate. 
+**		The original function did nothing but has been modified to 
+** 		support the If-Modified-Since header to support browser-side
+**		and the Authorization header if basic authentication is enabled.
 */
 
 void ParseHttpHeader() {
@@ -463,7 +472,45 @@ void ParseHttpHeader() {
 	if (stricmp(szHdr, "If-Modified-Since") == 0) {	
 		errParse = errNotModified;
 	}
+	if (stricmp(szHdr, "Authorization") == 0) {
+		ParseAuthToken();
+	}
+}
 
+/* ------------------------------------------------------------ */
+/***	ParseAuthToken
+**
+**	Parameters:
+**
+**	Return Value:
+**		none
+**
+**	Errors:
+**		none
+**
+**	Description:
+**		Called when we hit an "Authorization" token. Parse past the Basic word
+**		and get the base64 encoded token that follows. Compare against the
+**		encoded value of the valid one and  set errParse to errOK if equal.
+*/
+void ParseAuthToken() {
+	char	szAuthToken[64];
+	// Eat colon, spaces, the 'Basic' token and the trailing token, then get the encrypted credentials token
+	SkipSpace();
+	ParseToken(szAuthToken, ' ');
+	SkipSpace();
+	ParseToken(szAuthToken, ' ');
+	if (stricmp(szAuthToken, "Basic") == 0) {
+		SkipSpace();
+		ParseToken(szAuthToken, '\n');
+		int rslt = strcmp(szAuthToken, encodedCreds);
+		if (rslt == 0) {
+			errParse = errOK;
+			return;
+		} else
+			Serial.println("Unauthorized");
+	}
+	errParse = errNotAuthorized;
 }
 
 /* ------------------------------------------------------------ */

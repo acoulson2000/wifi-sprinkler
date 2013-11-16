@@ -36,6 +36,7 @@
 #define	idresLedForm		8
 #define	idresFile			9
 #define	idres404			10
+#define	idres401			11
 
 /* Resource names.
 */
@@ -58,6 +59,7 @@
 #define	rtypPng				5		//PNG image
 #define	rtypJs				6		//Javascript image
 #define	rtypCss				7		//CSS image
+#define	rtypJson			8		//JSON data request
 
 /* Parser error codes.
 */
@@ -66,6 +68,7 @@
 #define	errNotImplemented	2		//method not supported
 #define	errBadRequest		3		//unknown method requested
 #define	errNotModified		4		//not-changed (cache)
+#define	errNotAuthorized	5		//not-authorized (HTTP 401 Not Authorized)
 
 /* ------------------------------------------------------------ */
 /*					Variable Declarations						*/

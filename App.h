@@ -49,7 +49,7 @@
 // Determine which RealTime Clock you want to use by uncommenting one of the following.
 // While there is a RTCC built into the PIC chip of the chipKIT Uno32, uC32 and Max32 boards, it requires
 // that you solder a crystal onto the board and the time does not survive power failures. I happened to 
-// obtain a very inexpensive (<$4) DS1302-based board so I cobbled together a library for reading and
+// obtain a very inexpensive (< $4) DS1302-based board so I cobbled together a library for reading and
 // writing from it. This library, which I have included in the source repository for this project,
 // will be included automatically if RTCC_DS1302 is defined here. If RTCC_PIC32 is defined,
 // the library user-contributed library from here http://sourceforge.net/projects/chipkitrtcc/

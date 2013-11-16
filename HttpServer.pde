@@ -67,8 +67,8 @@
 /*																		*/
 /************************************************************************/
 
-#include <plib.h>
-
+#include	<plib.h>
+#include	<string.h>
 /* ------------------------------------------------------------ */
 /*					Network Library Includes					*/
 /* ------------------------------------------------------------ */
@@ -107,6 +107,7 @@
 #include	"HtmlSource.h"
 #include	"BoardDefs.h"
 #include	"App.h"
+#include	"Base64.h"
 
 #if defined(RTCC_DS1302)
  #include <chipKITDS1302.h>
@@ -133,7 +134,7 @@
 ** to the server.
 */
 #if (USE_DHCP == 0)
-IPv4        ipServer = { 192,168,2,111 };
+IPv4        ipServer = { 192,168,1,10 };
 #endif // End No DHCP
 
 /* Define the port on which the server will listen for inbound
@@ -141,6 +142,15 @@ IPv4        ipServer = { 192,168,2,111 };
 */
 uint16_t    ptServer = 80;
 
+/* Set to 1 if you want webserver to require credentials, otherwise 0.
+** If you do, also define the authCreds below in the form "username:password".
+*/
+int			requireAuth =	1;
+char		authCreds[] =	"yourusername:yourpassword";
+
+// This will hold the encoded form
+char encodedCreds[64];
+	
 /* ------------------------------------------------------------ */
 /*				Local Type and Constant Definitions				*/
 /* ------------------------------------------------------------ */
@@ -235,6 +245,7 @@ extern int	rtypResource;
 extern int	cbResource;
 extern char	szResourcePath[];
 extern int	errParse;
+extern int	errHttpRequest;
 
 /* Declare the server and client objects. This server only
 ** accetps a single client at a time, so only a single client
@@ -260,7 +271,6 @@ int		cchLineCur;
 char *	pchLineCur;
 int		fInputReady;
 int		fRequestStart;
-int		errHttpRequest;
 
 File	fhData;			// data file object for reading files an SD card
 
@@ -290,7 +300,7 @@ extern uint8_t	rgbFileBuf[];
 
 //***DLC
 char * szSSID       = "yourssid";			// the name of the network to connect to
-char * szPassPhrase	= "yourkey";			// pass phrase to use with WPA2
+char * szPassPhrase	= "yourpassphrase";			// pass phrase to use with WPA2
 											//   has no meaning if using open security
 int	conID			= DWIFIcK::INVALID_CONNECTION_ID; 
      
@@ -340,8 +350,7 @@ void PutResponseBody();
 **      operation.
 */
 
-void setup()
-    {
+void setup() {
 
     /* We're going to use printing to the serial monitor window as a
     ** surrogate for logging the data. Initialize the serial port
@@ -352,12 +361,12 @@ void setup()
     Serial.println("Digilent Example HTTP Server");
     Serial.println("");
 	
-    /* Initialize everything.
-    */
+    /* Initialize everything. */
 	ClockInit();
     AppInit();
     StackInit();
 
+	base64_encode((char *)encodedCreds, (char *)authCreds, strlen(authCreds));
 }
 
 /* ------------------------------------------------------------ */
@@ -1023,8 +1032,22 @@ HttpTask()
 			** won't be a message body. In response to a GET request
 			** we need to send the requested resource.
 			*/
-			//Serial.println();
 			errHttpRequest = errParse;
+			// IF authorization is required, first check whether there was a
+			// valid authorizatio header found during parse. If not, set flag
+			// to send 401 and advance to next state. 
+			if (requireAuth == 1 && errHttpRequest == errNotAuthorized) {
+				idresRequest = idres401;
+				sthCur = sthSendLocalResource;
+// SHOULD WE END EARLY VIA THIS CODE?
+/*				PutResponseStart();
+				PutResponseHeader();
+				stcCur = stcCloseConnection;
+				sthCur = sthIdle;
+				msClientActivity = millis();
+*/
+				break;
+			}
 			if (errHttpRequest == errOK) {
 				if (idresRequest == idresFile) {
 					sthCur = sthBeginFileTransfer;

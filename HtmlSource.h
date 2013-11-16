@@ -62,6 +62,7 @@ extern char	szResponseNotFound[];
 extern char	szResponseNotImplemented[];
 extern char	szResponseBadRequest[];
 extern char szResponseNotModified[];
+extern char szResponseNotAuthorized[];
 
 extern char szHeaderContentText[];
 extern char	szHeaderContentHtml[];
@@ -69,12 +70,14 @@ extern char szHeaderContentJpeg[];
 extern char szHeaderContentGif[];
 extern char szHeaderContentPng[];
 extern char szHeaderContentJs[];
+extern char szHeaderContentJson[];
 extern char szHeaderContentCss[];
 extern char szHeaderLength[];
 extern char szHeaderCache[];
 
 extern char	szHomePage[];
 extern char	szStatusPage[];
+extern char	sz401Page[];
 extern char	sz404Page[];
 
 extern char	szHtmlBr[];

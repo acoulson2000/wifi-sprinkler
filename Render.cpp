@@ -81,12 +81,9 @@ extern char		szResourcePath[];
 
 extern File	fhData;
 
-
-extern int	errHttpRequest;
-
-extern char *	pgmStatus;
-
-extern ZONE_INFO events[MAX_EVENTS] ;
+extern int			requireAuth;
+extern int			errHttpRequest;
+extern ZONE_INFO	events[MAX_EVENTS] ;
 
 /* ------------------------------------------------------------ */
 /*				Local Variables									*/
@@ -104,6 +101,7 @@ void RenderStatusPage();
 void putCacheHeaders();
 void RenderEventListPage();
 void RenderOKPage();
+void Render401Page();
 void Render404Page();
 
 /* ------------------------------------------------------------ */
@@ -123,9 +121,14 @@ void Render404Page();
 */
 
 void InitHttpRequest() {
-
-	errHttpRequest = errOK;
-
+	// If we are requiring auth credentials in http request, default 
+	// errHttpRequest to errNotAuthorized - it will be set to errOK
+	// if we get the correct authorization header.
+	if (requireAuth == 1) {
+		errHttpRequest = errNotAuthorized;
+	} else {
+		errHttpRequest = errOK;
+	}
 }
 
 /* ------------------------------------------------------------ */
@@ -140,12 +143,10 @@ void InitHttpRequest() {
 **	Description:
 **
 */
-
 void PutResponseStart() {
 
 	if (errHttpRequest == errOK) {
-		/* Send a request successful header.
-		*/
+		/* Send a request successful header. */
 		Serial.println(szResponseOk);
 		tcpClient.println(szResponseOk);
 	}
@@ -156,16 +157,26 @@ void PutResponseStart() {
 		tcpClient.println(szResponseNotFound);
 	}
 	else if (errHttpRequest == errNotImplemented) {
-		/* Send the method not implemented header
-		*/
+		/* Send the method not implemented header */
 		Serial.println(szResponseNotImplemented);
 		tcpClient.println(szResponseNotImplemented);
 	}
 	else if (errHttpRequest == errNotModified) {
-		/* Send the method not implemented header
-		*/
-		Serial.println(szResponseNotModified);
-		tcpClient.println(szResponseNotModified);
+		/* if the request was for a json response, it should never return a 304,
+			even if there was a if-not-modified header */
+		if (rtypResource == rtypJson) {
+			Serial.println(szResponseOk);
+			tcpClient.println(szResponseOk);
+		} else {
+			/* Send the method not modified header */
+			Serial.println(szResponseNotModified);
+			tcpClient.println(szResponseNotModified);
+		}
+	}
+	else if (errHttpRequest == errNotAuthorized) {
+		/* Send the method not authorized header */
+		Serial.println(szResponseNotAuthorized);
+		tcpClient.println(szResponseNotAuthorized);
 	}
 	else {
 		/* Something else wrong with the request. Send
@@ -188,10 +199,8 @@ void PutResponseStart() {
 **	Description:
 **
 */
-
 void PutResponseHeader() {
-	/* Send the content type of the response.
-	*/
+	/* Send the content type of the response. */
 	switch(rtypResource) {
 		case rtypJs:
 			//Serial.println(szHeaderContentJs);
@@ -209,6 +218,11 @@ void PutResponseHeader() {
 		case rtypText:
 			//Serial.println(szHeaderContentText);
 			tcpClient.println(szHeaderContentText);
+			break;
+
+		case rtypJson:
+			//Serial.println(szHeaderContentJson);
+			tcpClient.println(szHeaderContentJson);
 			break;
 
 		case rtypHtml:
@@ -300,6 +314,10 @@ void PutResponseBody() {
 			
 		case idresSaveEvent:
 			RenderOKPage();
+			break;
+			
+		case idres401:
+			Render401Page();
 			break;
 			
 		case idres404:
@@ -432,6 +450,12 @@ void RenderEventListPage() {
 void RenderOKPage() {
 	DNETcK::setDefaultBlockTime(1000);
 	tcpClient.println("OK");
+	DNETcK::setDefaultBlockTime(DNETcK::msImmediate);
+}
+
+void Render401Page() {
+	DNETcK::setDefaultBlockTime(5000);   
+	tcpClient.print(sz401Page);
 	DNETcK::setDefaultBlockTime(DNETcK::msImmediate);
 }
 

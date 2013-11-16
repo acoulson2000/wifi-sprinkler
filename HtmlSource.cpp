@@ -71,6 +71,7 @@ char szResponseNotModified[] = { "HTTP/1.1 304 Not Modified" };
 char szResponseNotFound[] = { "HTTP/1.1 404 Not Found" };
 char szResponseNotImplemented[] = { "HTTP/1.1 501 Not Implemented" };
 char szResponseBadRequest[] = { "HTTP/1.1 400 Bad Request" };
+char szResponseNotAuthorized[] = { "HTTP/1.1 401 Not Authorized\nWWW-Authenticate: Basic realm=\"WiH2O\"" };
 
 /* Content type headers for the various types of content we know
 ** how to return.
@@ -80,7 +81,8 @@ char szHeaderContentText[] = { "Content-type: text/plain" };
 char szHeaderContentJpeg[] = { "Content-type: image/jpeg" };
 char szHeaderContentGif[]  = { "Content-type: image/gif" };
 char szHeaderContentPng[]  = { "Content-type: image/png" };
-char szHeaderContentJs[]   = { "Content-Type: application/x-javascript" };
+char szHeaderContentJs[]   = { "Content-Type: application/javascript" };
+char szHeaderContentJson[]   = { "Content-Type: application/json" };
 char szHeaderContentCss[]  = { "Content-Type: text/css" };
 
 char szHeaderLength[] = { "Content-length: " };
@@ -102,6 +104,10 @@ char szHomePage[] = {
 
 char szStatusPage[] = {
 	"{\"status\": \"%s\", \"date\": \"%s\", \"time\": \"%s\"}"
+};
+
+char sz401Page[] = {
+"<html>\r\n<head><title>HTTP 401 Not Authorized</title></head>\r\n<strong>401 - You are not authorized to view this page.\r\n</html>\r\n"
 };
 
 char sz404Page[] = {

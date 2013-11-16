@@ -17,7 +17,7 @@
 		<link rel="stylesheet" type="text/css" href="jqui.css">
 		<link rel="stylesheet" type="text/css" href="jquithem.css">
 		<link rel="stylesheet" type="text/css" href="jquidp.css">
-		<!--script src="jqrymin.js"></script-->
+		<meta http-equiv="refresh" content="900"><!--refresh every 15 min-->
 		<script src="jqrymin.js"></script>
 		<script src="jquimin.js"></script>
 		<script src="jsrender.js"></script>
@@ -77,7 +77,6 @@
 						</tr>
 					</thead>
 					<tbody id="eventTable">
-						<form action="save.do" id="event_0" method="post">
 						<tr>
 							<td>
 								<input name="eventIdx" type="hidden" value="0" />
@@ -111,7 +110,6 @@
 								<img alt="Zone 1 Off" name="zoneOff" src="off24.png" style="width: 24px; height: 24px;"/></td>
 							<td class="lastStart" NOWRAP>
 							</td>
-						</form>
 						</tr>
 					</tbody>
 				</table>
@@ -124,7 +122,6 @@
 	<script id="eventTmpl" type="text/x-jsrender">
 		{{for events}}
 		<tr>
-		<form action="save.do" id="event_0" method="post">
 			<td>
 				<input name="eventIdx" type="hidden" value="{{>eventIdx}}" />
 				<input maxlength="32" name="eventName" size="36" type="text" value="{{>eventName}}" />
@@ -161,7 +158,6 @@
 			<td NOWRAP>
 				<div name="lastStart" class="lastStart" >{{dateTime:lastStart}}</div>
 			</td>
-		</form>
 		</tr>
 		{{/for}}
 	</script>
@@ -170,7 +166,8 @@
 	//var jsondata = {"maxZones": 6, "events": [{"eventIdx": 0, "eventName: 'NAME_1_xxxxxxxxxxxxxxxxxxxxx321|', zoneNumber: 1, eventActive: 'Y', eventTime: '19:30', eventRuntime: 10, eventRunOn: 'YNYNYNN'}]};
 
 	$(function () {	
-	
+		$.ajaxSetup({ cache: false, contentType:"application/json; charset=utf-8" });
+		
 		$(document).ajaxStart(function() {
 			$("#loading").show();
 		});
@@ -199,8 +196,11 @@
 			dateTime: function (value) {
 				var result = "";
 				if (value > 0) {
-					var dt = new Date(value * 1000);				
-					result = (dt.getUTCMonth()+1) + "/" + dt.getUTCDate() + " " + dt.getUTCHours() + ":" + dt.getUTCMinutes();
+					var dt = new Date(value * 1000);
+					var sTime = (dt.getUTCHours() < 10) ? ("0" + dt.getUTCHours()) : dt.getUTCHours();
+					sTime = sTime + ":" + ((dt.getUTCMinutes() < 10) ? ("0" + dt.getUTCMinutes()) : dt.getUTCMinutes());
+					var sDate = (dt.getUTCMonth()+1) + "/" + dt.getUTCDate();
+					result = sDate + " " + sTime;
 				}
 				return result;
 			}
@@ -231,12 +231,14 @@
 				}
 			}
 						
-			$("form").submit(function(event) {
-				var nameField = this[1]; // the eventName input field
+			$('INPUT[type="submit"]').click(function(event) {
+				// trim spaces from Event name
+				var nameField = $(this).parent().parent().find('input[name="eventName"]')[0]; // the eventName input field
 				var nameStr = nameField.value;
 				nameStr = nameStr.trim()
 				nameField.value = nameStr;
-				var params = $(this).serialize();
+				var inputFields = $(this).parent().parent().find('input,select');
+				var params = inputFields.serialize();
 				$.ajax({
 					url: "saveevnt.do",
 					type: "get",
@@ -278,7 +280,10 @@
 					timeout: 2000,
 					success: function(){
 						var dt = new Date();
-						parentForm.find(".lastStart").text((dt.getMonth()+1) + "/" + dt.getDate() + " " + dt.getHours() + ":" + dt.getMinutes());
+						var sTime = (dt.getUTCHours() < 10) ? ("0" + dt.getUTCHours()) : dt.getUTCHours();
+						sTime = sTime + ":" + ((dt.getUTCMinutes() < 10) ? ("0" + dt.getUTCMinutes()) : dt.getUTCMinutes());
+						var sDate = (dt.getUTCMonth()+1) + "/" + dt.getUTCDate();
+						parentForm.find(".lastStart").text(sDate + " " + sTime);
 						getStatus();
 					},
 					error:function(){

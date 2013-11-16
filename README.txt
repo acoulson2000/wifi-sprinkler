@@ -90,6 +90,9 @@ Configuration:
 
 
                             
+	int	requireAuth =	1;		// Set to 1 if you want webserver to require credentials, otherwise 0.
+	
+char	authCreds[] =	"yourusername:yourpassword";	// If you do, also define the authCreds below in the form "username:password"
 
         // Set to 1 if using DHCP, 0 if using a static IP       
         #define USE_DHCP    0                   // 0 -> Static IP, 1 -> DHCP
@@ -155,8 +158,6 @@ Configuration:
 Stuff left to do:
 -----------------
 Sync Time with time server   -  Periodically sync RTC with time server..or at least browser time..RTC's seem to drift a lot.
-
-Add basic HTML authentication? (optional) - Currently the assumption is that your WiFi is secure.
 
 Remove custom DS1302 lib     -  Originally, the DS1302 did not seem to work with all the libraries I tried. I wound
                                 up creating a custom one () that seemed to work better, but I also added a pullup 
